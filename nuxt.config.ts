@@ -11,6 +11,10 @@ export default defineNuxtConfig({
     head: {
       // Default to light; an inline script below will flip to dark if needed
       htmlAttrs: { lang: 'en', 'data-theme': 'light' },
+      meta: [
+        // Ensure a theme-color tag exists early for the inline script to update
+        { name: 'theme-color', content: '#ffffff' }
+      ],
       // Minimal inline CSS to avoid white flash before CSS loads
       style: [
         {
@@ -23,18 +27,8 @@ export default defineNuxtConfig({
         {
           key: 'theme-inline-early',
           tagPosition: 'head',
-          // Minimal inline to set attribute immediately; external script will refine meta, etc.
-          children: `(function(){try{var s=localStorage.getItem('theme');var t=(s==='light'||s==='dark')?s:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;}catch(_){}})();`
-        },
-        {
-          key: 'theme-init',
-          tagPosition: 'head',
-          // Early theme selection before hydration
-          src: '/theme-init.js',
-          // Ensure it runs as early as possible
-          defer: false,
-          async: false,
-          tagPriority: 'critical'
+          // Full inline logic: set data-theme and meta[name="theme-color"] with no network
+          children: `(function(){try{var w=window,d=document,e=d.documentElement,s=null;try{s=localStorage.getItem('theme')}catch(_){/* ignore */}var mql=w.matchMedia&&w.matchMedia('(prefers-color-scheme: dark)'),t=(s==='light'||s==='dark')?s:(mql&&mql.matches?'dark':'light');e.dataset.theme=t;var m=d.querySelector('meta[name="theme-color"]');if(!m){m=d.createElement('meta');m.setAttribute('name','theme-color');d.head.appendChild(m);}m.setAttribute('content',t==='dark'?'#0e0e0e':'#ffffff');}catch(_){/* ignore */}})();`
         }
       ]
     }
