@@ -6,6 +6,10 @@ const config = useRuntimeConfig()
 const route = useRoute()
 const canonical = computed(() => `${config.public.siteUrl}${route.path}`)
 const ogImage = computed(() => `${config.public.siteUrl}/og.png`)
+// Theme color for browser UI that matches current theme
+import { useTheme } from '~/features/theme-toggle/model/useTheme'
+const { theme } = useTheme()
+const metaThemeColor = computed(() => (theme.value === 'dark' ? '#0e0e0e' : '#ffffff'))
 
 // Online/offline state for showing an in-app banner
 const isOnline = ref(true)
@@ -65,7 +69,7 @@ useSeoMeta({
   twitterImage: ogImage.value,
 
   // Browser UI
-  themeColor: '#020420'
+  themeColor: metaThemeColor
 })
 </script>
 
