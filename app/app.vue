@@ -81,10 +81,32 @@ useSeoMeta({
   // Browser UI
   themeColor: metaThemeColor
 })
+// First-render intro overlay (client-only)
+const showIntro = ref(false)
+
+if (process.client) {
+  // show only once per session and only if not set previously
+  const key = 'cv:intro:seen'
+  const seen = sessionStorage.getItem(key)
+  // Respect reduced motion preference
+  const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+  showIntro.value = !seen && !prefersReduced
+  if (showIntro.value) {
+    // ensure it won't repeat this session
+    sessionStorage.setItem(key, '1')
+  }
+}
+
+function handleIntroDone() {
+  showIntro.value = false
+}
 </script>
 
 <template>
   <div id="app">
+    <ClientOnly>
+      <FirstRenderIntro v-if="showIntro" @done="handleIntroDone" />
+    </ClientOnly>
   <div v-if="!isOnline" class="offline-banner">You’re offline. Viewing cached content.</div>
     <div class="page">
       <NuxtPage />
