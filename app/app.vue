@@ -1,7 +1,9 @@
 <script setup lang="ts">
 // Compute the current absolute URL for canonical and OG url
 const url = useRequestURL()
-const siteName = 'Pavel Zagvozdin'
+const siteName = 'Pavel Zagvozdin — CV'
+const origin = url.origin
+const ogImage = `${origin}/og.png`
 
 // Online/offline state for showing an in-app banner
 const isOnline = ref(true)
@@ -24,28 +26,44 @@ onBeforeUnmount(() => {
 useHead({
   // Avoid duplicating the site name when a page title is already provided
   titleTemplate: (titleChunk?: string) => (titleChunk ? titleChunk : siteName),
+  htmlAttrs: { lang: 'en' },
+  meta: [
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { charset: 'utf-8' }
+  ],
   link: [
-  { rel: 'canonical', href: url.href },
-  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-  { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-  { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' },
-  // Use a blank favicon to avoid showing the Nuxt icon in the browser tab
-  { rel: 'icon', href: 'data:,' },
-  { rel: 'shortcut icon', href: 'data:,' }
+    { rel: 'canonical', href: url.href },
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' },
+    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'shortcut icon', href: '/favicon.ico' }
   ]
 })
 
 useSeoMeta({
   // Basic
-  title: 'Pavel Zagvozdin',
+  title: siteName,
   description: 'Frontend developer CV.',
+  robots: 'index, follow',
 
   // Open Graph
-  ogTitle: 'Pavel Zagvozdin',
+  ogTitle: siteName,
   ogDescription: 'Frontend developer CV.',
   ogType: 'website',
   ogUrl: url.href,
   ogSiteName: siteName,
+  ogImage: ogImage,
+  ogImageAlt: siteName,
+
+  // Twitter
+  twitterCard: 'summary_large_image',
+  twitterTitle: siteName,
+  twitterDescription: 'Frontend developer CV.',
+  twitterImage: ogImage,
+
+  // Browser UI
+  themeColor: '#020420'
 })
 </script>
 

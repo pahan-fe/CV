@@ -5,6 +5,31 @@ import { experience } from '../entities/experience'
 import { education } from '../entities/education'
 import { skills } from '../entities/skills'
 import { languages } from '../entities/languages'
+
+// Page-level SEO
+const url = useRequestURL()
+useSeoMeta({
+  title: `${profile.name} — ${profile.role}`,
+  description: `${profile.name} — ${profile.role}. Experience, skills, education and contacts.`
+})
+
+// Schema.org
+useSchemaOrg([
+  defineWebSite({
+    name: `${profile.name} — CV`,
+    url: url.origin
+  }),
+  definePerson({
+    name: profile.name,
+    jobTitle: profile.role,
+    sameAs: [profile.linkedin],
+    email: profile.email.replace('mailto:', '')
+  }),
+  defineWebPage({
+    name: 'Resume',
+    description: `${profile.name} — ${profile.role} resume`
+  })
+])
 </script>
 
 <template>

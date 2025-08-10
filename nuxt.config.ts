@@ -7,6 +7,10 @@ export default defineNuxtConfig({
   css: ['~/shared/styles/reset.css'],
   modules: [
     '@nuxt/eslint',
+  // SEO and discovery
+  '@nuxtjs/sitemap',
+  '@nuxtjs/robots',
+  'nuxt-schema-org',
     ['@vite-pwa/nuxt', {
       registerType: 'autoUpdate',
       // Disable SW during development to avoid offline.html showing while online
@@ -54,5 +58,24 @@ export default defineNuxtConfig({
         periodicSyncForUpdates: 24 * 60 * 60 * 1000
       }
     }]
-  ]
+  ],
+  // Public runtime config used by SEO modules and in-app canonical links
+  runtimeConfig: {
+    public: {
+      // Set this via NUXT_SITE_URL in production (e.g. https://your-domain.tld)
+      siteUrl: process.env.NUXT_SITE_URL || 'http://localhost:3000'
+    }
+  },
+  // @nuxtjs/sitemap configuration
+  sitemap: {
+  includeAppSources: true,
+  cacheMaxAgeSeconds: 60 * 10, // 10 minutes
+  exclude: ['/offline.html']
+  },
+  // @nuxtjs/robots configuration
+  robots: {
+  allow: ['/'],
+  disallow: ['/offline.html'],
+  sitemap: ['/sitemap.xml']
+  }
 })
