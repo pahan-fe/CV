@@ -11,6 +11,17 @@ import { useTheme } from '~/features/theme-toggle/model/useTheme'
 const { theme } = useTheme()
 const metaThemeColor = computed(() => (theme.value === 'dark' ? '#0e0e0e' : '#ffffff'))
 
+// Use a blank favicon in production to avoid Nuxt default icon
+const faviconLinks = import.meta.dev
+  ? [
+      { rel: 'icon', href: '/favicon.ico' },
+      { rel: 'shortcut icon', href: '/favicon.ico' }
+    ]
+  : [
+      // 1x1 transparent PNG
+      { rel: 'icon', type: 'image/png', href: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=' }
+    ]
+
 // Online/offline state for showing an in-app banner
 const isOnline = ref(true)
 let onOnline: () => void
@@ -42,8 +53,7 @@ useHead({
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' },
-    { rel: 'icon', href: '/favicon.ico' },
-    { rel: 'shortcut icon', href: '/favicon.ico' }
+  ...faviconLinks
   ]
 })
 
