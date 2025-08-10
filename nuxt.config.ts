@@ -12,7 +12,26 @@ export default defineNuxtConfig({
       // Disable SW during development to avoid offline.html showing while online
       devOptions: { enabled: false, suppressWarnings: true },
       workbox: process.env.NODE_ENV === 'production' ? {
-        navigateFallback: '/'
+        // In SSR, avoid navigateFallback to a non-existent precached '/index.html'.
+        // Provide an offline fallback for navigation requests instead.
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkOnly',
+            options: {
+              plugins: [
+                {
+                  // When navigation fails (offline), serve the precached offline page
+                  handlerDidError: async () => caches.match('/offline.html')
+                }
+              ]
+            }
+          }
+        ],
+        additionalManifestEntries: [
+          { url: '/', revision: null },
+          { url: '/offline.html', revision: null }
+        ]
       } : undefined,
       manifest: {
         name: 'Pavel Zagvozdin — CV',
