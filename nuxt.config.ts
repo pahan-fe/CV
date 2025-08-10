@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  srcDir: 'app',
+  srcDir: 'src',
   // Use SSR in production; we'll provide a partial offline experience via SW
   ssr: true,
   pages: true,
@@ -10,7 +10,6 @@ export default defineNuxtConfig({
   // Auto-import Vue components from FSD locations
   components: [
     { path: '~/shared/ui', pathPrefix: false },
-    // Enable using feature UI components like <ThemeToggle /> without import
     { path: '~/features', pathPrefix: true }
   ],
   app: {
