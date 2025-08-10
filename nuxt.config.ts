@@ -3,6 +3,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   srcDir: 'app',
+  // Enable SPA mode so the app shell (index.html) is generated and can be cached for offline use
+  ssr: false,
   pages: true,
   css: ['~/shared/styles/reset.css'],
   app: {
@@ -26,33 +28,48 @@ export default defineNuxtConfig({
       // Disable SW during development to avoid offline.html showing while online
       devOptions: { enabled: false, suppressWarnings: true },
       workbox: process.env.NODE_ENV === 'production' ? {
-        // Avoid default app-shell navigation fallback which can serve stale index.html
-        navigateFallback: null,
+        // Use an app-shell SPA fallback so navigation works offline
+        navigateFallback: '/index.html',
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        // Do not precache HTML files; only static assets
-        globPatterns: ['**/*.{js,css,ico,png,svg,webp,woff,woff2}'],
-        globIgnores: ['**/*.html'],
-        // In SSR, avoid navigateFallback to a non-existent precached '/index.html'.
-        // Provide an offline fallback for navigation requests instead.
+        // Precache HTML and static assets
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        // Ensure app shell is precached even when running with Nitro server
+        additionalManifestEntries: [
+          { url: '/index.html', revision: null }
+        ],
+        // Runtime strategies for better UX and offline capability
         runtimeCaching: [
           {
-            urlPattern: ({ request }) => request.mode === 'navigate',
-            handler: 'NetworkOnly',
+            // Documents: try network, fall back to cache (index.html) when offline
+            urlPattern: ({ request }) => request.mode === 'navigate' || request.destination === 'document',
+            handler: 'NetworkFirst',
             options: {
-              plugins: [
-                {
-                  // When navigation fails (offline), serve the precached offline page
-                  handlerDidError: async () => caches.match('/offline.html')
-                }
-              ]
+              cacheName: 'html-cache',
+              networkTimeoutSeconds: 3
+            }
+          },
+          {
+            // JS/CSS/workers: fast from cache, update in background
+            urlPattern: ({ request }) => ['script', 'style', 'worker'].includes(request.destination),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'assets-cache'
+            }
+          },
+          {
+            // Images and fonts: cache first with expiration
+            urlPattern: ({ request }) => ['image', 'font'].includes(request.destination),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
             }
           }
-        ],
-        // Only ensure offline page is precached; do not precache '/'
-        additionalManifestEntries: [
-          { url: '/offline.html', revision: null }
         ]
       } : undefined,
       manifest: {
@@ -87,13 +104,11 @@ export default defineNuxtConfig({
   // @nuxtjs/sitemap configuration
   sitemap: {
   includeAppSources: true,
-  cacheMaxAgeSeconds: 60 * 10, // 10 minutes
-  exclude: ['/offline.html']
+  cacheMaxAgeSeconds: 60 * 10 // 10 minutes
   },
   // @nuxtjs/robots configuration
   robots: {
   allow: ['/'],
-  disallow: ['/offline.html'],
   sitemap: ['/sitemap.xml']
   }
 })
