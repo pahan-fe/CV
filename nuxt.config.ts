@@ -3,8 +3,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   srcDir: 'app',
-  // Enable SPA mode so the app shell (index.html) is generated and can be cached for offline use
-  ssr: false,
+  // Use SSR in production; we'll provide a partial offline experience via SW
+  ssr: true,
   pages: true,
   css: ['~/shared/styles/reset.css'],
   app: {
@@ -28,26 +28,36 @@ export default defineNuxtConfig({
       // Disable SW during development to avoid offline.html showing while online
       devOptions: { enabled: false, suppressWarnings: true },
       workbox: process.env.NODE_ENV === 'production' ? {
-        // Use an app-shell SPA fallback so navigation works offline
-        navigateFallback: '/index.html',
+        // In SSR, do not use a static index.html fallback; provide offline.html instead
+        navigateFallback: null,
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        // Precache HTML and static assets
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
-        // Ensure app shell is precached even when running with Nitro server
+        // Precache static assets; HTML is served by server when online
+        globPatterns: ['**/*.{js,css,ico,png,svg,webp,woff,woff2}'],
+        // Precache offline fallback page
         additionalManifestEntries: [
-          { url: '/index.html', revision: null }
+          { url: '/offline.html', revision: null }
         ],
         // Runtime strategies for better UX and offline capability
         runtimeCaching: [
           {
-            // Documents: try network, fall back to cache (index.html) when offline
+            // Documents: try network SSR, fall back to last cached page; if nothing cached, show offline.html
             urlPattern: ({ request }) => request.mode === 'navigate' || request.destination === 'document',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'html-cache',
-              networkTimeoutSeconds: 3
+              networkTimeoutSeconds: 3,
+              // limit how many HTML entries are kept
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 // 1 day
+              },
+              plugins: [
+                {
+                  handlerDidError: async () => caches.match('/offline.html')
+                }
+              ]
             }
           },
           {
@@ -104,11 +114,13 @@ export default defineNuxtConfig({
   // @nuxtjs/sitemap configuration
   sitemap: {
   includeAppSources: true,
-  cacheMaxAgeSeconds: 60 * 10 // 10 minutes
+  cacheMaxAgeSeconds: 60 * 10, // 10 minutes
+  exclude: ['/offline.html']
   },
   // @nuxtjs/robots configuration
   robots: {
   allow: ['/'],
+  disallow: ['/offline.html'],
   sitemap: ['/sitemap.xml']
   }
 })
