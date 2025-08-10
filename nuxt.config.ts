@@ -20,7 +20,14 @@ export default defineNuxtConfig({
         {
           key: 'theme-bg-inline',
           tagPriority: 'critical',
-          children: `html{background-color:#ffffff;color-scheme:light} @media (prefers-color-scheme: dark){html{background-color:#0e0e0e;color-scheme:dark}} html[data-theme="dark"]{background-color:#0e0e0e;color-scheme:dark} html[data-theme="light"]{background-color:#ffffff;color-scheme:light} body{background:transparent}`
+          children: `/* prevent white flash and define CSS vars before CSS loads */
+            html{background-color:#ffffff;color-scheme:light}
+            @media (prefers-color-scheme: dark){html{background-color:#0e0e0e;color-scheme:dark}}
+            html[data-theme="dark"]{background-color:#0e0e0e;color-scheme:dark}
+            html[data-theme="light"]{background-color:#ffffff;color-scheme:light}
+            body{background:transparent}
+            :root{--bg:#ffffff;--fg:#020420;--accent:#00DC82;--bg-soft:#f6f8fb;--card:#ffffff;--muted:#5b6575;--border:#e6eaf0;--shadow:0 10px 30px rgba(2,4,32,.06);--hover-bg:#f3f4f6;--hover-border:#cfd6e2;--hover-ring:rgba(91,101,117,.25);color-scheme:light}
+            html[data-theme="dark"]{--bg:#0e0e0e;--fg:#f0f0f0;--accent:#00DC82;--bg-soft:#141414;--card:#171717;--muted:#b0b0b0;--border:#262626;--shadow:0 10px 30px rgba(0,0,0,.5);--hover-bg:#1f1f1f;--hover-border:#333333;--hover-ring:rgba(176,176,176,.25);color-scheme:dark}`
         }
       ],
       script: [
@@ -44,6 +51,14 @@ export default defineNuxtConfig({
       // Disable SW during development to avoid offline.html showing while online
       devOptions: { enabled: false, suppressWarnings: true },
       workbox: process.env.NODE_ENV === 'production' ? {
+        // Avoid default app-shell navigation fallback which can serve stale index.html
+        navigateFallback: null,
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        // Do not precache HTML files; only static assets
+        globPatterns: ['**/*.{js,css,ico,png,svg,webp,woff,woff2}'],
+        globIgnores: ['**/*.html'],
         // In SSR, avoid navigateFallback to a non-existent precached '/index.html'.
         // Provide an offline fallback for navigation requests instead.
         runtimeCaching: [
@@ -60,8 +75,8 @@ export default defineNuxtConfig({
             }
           }
         ],
+        // Only ensure offline page is precached; do not precache '/'
         additionalManifestEntries: [
-          { url: '/', revision: null },
           { url: '/offline.html', revision: null }
         ]
       } : undefined,
