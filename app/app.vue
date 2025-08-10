@@ -2,8 +2,10 @@
 // Compute the current absolute URL for canonical and OG url
 const url = useRequestURL()
 const siteName = 'Pavel Zagvozdin — CV'
-const origin = url.origin
-const ogImage = `${origin}/og.png`
+const config = useRuntimeConfig()
+const route = useRoute()
+const canonical = computed(() => `${config.public.siteUrl}${route.path}`)
+const ogImage = computed(() => `${config.public.siteUrl}/og.png`)
 
 // Online/offline state for showing an in-app banner
 const isOnline = ref(true)
@@ -32,7 +34,7 @@ useHead({
     { charset: 'utf-8' }
   ],
   link: [
-    { rel: 'canonical', href: url.href },
+  { rel: 'canonical', href: canonical.value },
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' },
@@ -53,14 +55,14 @@ useSeoMeta({
   ogType: 'website',
   ogUrl: url.href,
   ogSiteName: siteName,
-  ogImage: ogImage,
+  ogImage: ogImage.value,
   ogImageAlt: siteName,
 
   // Twitter
   twitterCard: 'summary_large_image',
   twitterTitle: siteName,
   twitterDescription: 'Frontend developer CV.',
-  twitterImage: ogImage,
+  twitterImage: ogImage.value,
 
   // Browser UI
   themeColor: '#020420'
