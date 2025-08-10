@@ -5,7 +5,7 @@ export type Theme = 'light' | 'dark'
 const STORAGE_KEY = 'theme'
 
 // Singleton state shared across composable callers
-const theme = ref<Theme>('light')
+const theme = ref<Theme>('dark')
 let initialized = false
 
 function apply(t: Theme) {
@@ -20,51 +20,14 @@ function init() {
   if (initialized || typeof window === 'undefined') return
   initialized = true
 
-  const getStored = (): Theme | null => {
+  // Start with dark, only override if a stored preference exists
+  try {
     const s = localStorage.getItem(STORAGE_KEY) as Theme | null
-    return s === 'light' || s === 'dark' ? s : null
-  }
-
-  const mql = window.matchMedia?.('(prefers-color-scheme: dark)')
-
-  const setFromSystem = () => {
-    const t: Theme = mql?.matches ? 'dark' : 'light'
-    // Only follow system when user hasn't chosen explicitly
-    if (!getStored()) {
-      theme.value = t
-      apply(t)
+    if (s === 'light' || s === 'dark') {
+      theme.value = s
     }
-  }
-
-  const stored = getStored()
-  if (stored) {
-    theme.value = stored
-  } else {
-    theme.value = mql?.matches ? 'dark' : 'light'
-  }
+  } catch { /* ignore */ }
   apply(theme.value)
-
-  // React to system theme changes when there's no stored preference
-  if (mql && typeof mql.addEventListener === 'function') {
-    mql.addEventListener('change', setFromSystem)
-  } else if (mql && typeof mql.addListener === 'function') {
-    // Safari < 14 fallback
-    mql.addListener(setFromSystem)
-  }
-
-  // Sync across tabs/windows
-  window.addEventListener('storage', (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY) {
-      const val = (e.newValue as Theme | null)
-      if (val === 'light' || val === 'dark') {
-        theme.value = val
-        apply(val)
-      } else if (val == null) {
-        // Preference cleared in another tab — follow system
-        setFromSystem()
-      }
-    }
-  })
 }
 
 export function useTheme() {

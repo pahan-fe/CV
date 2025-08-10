@@ -5,39 +5,14 @@ export default defineNuxtConfig({
   srcDir: 'app',
   pages: true,
   css: ['~/shared/styles/reset.css'],
-  // Ensure theme is set as early as possible on the client to avoid a flash
-  // of incorrect theme when statically hosted (no SSR at runtime).
   app: {
     head: {
-      // Default to light; an inline script below will flip to dark if needed
-      htmlAttrs: { lang: 'en', 'data-theme': 'light' },
+      // Default to dark to avoid first-render flip
+      htmlAttrs: { lang: 'en', 'data-theme': 'dark' },
       meta: [
-        // Ensure a theme-color tag exists early for the inline script to update
-        { name: 'theme-color', content: '#ffffff' }
+        { name: 'theme-color', content: '#0e0e0e' }
       ],
-      // Minimal inline CSS to avoid white flash before CSS loads
-      style: [
-        {
-          key: 'theme-bg-inline',
-          tagPriority: 'critical',
-          children: `/* prevent white flash and define CSS vars before CSS loads */
-            html{background-color:#ffffff;color-scheme:light}
-            @media (prefers-color-scheme: dark){html{background-color:#0e0e0e;color-scheme:dark}}
-            html[data-theme="dark"]{background-color:#0e0e0e;color-scheme:dark}
-            html[data-theme="light"]{background-color:#ffffff;color-scheme:light}
-            body{background:transparent}
-            :root{--bg:#ffffff;--fg:#020420;--accent:#00DC82;--bg-soft:#f6f8fb;--card:#ffffff;--muted:#5b6575;--border:#e6eaf0;--shadow:0 10px 30px rgba(2,4,32,.06);--hover-bg:#f3f4f6;--hover-border:#cfd6e2;--hover-ring:rgba(91,101,117,.25);color-scheme:light}
-            html[data-theme="dark"]{--bg:#0e0e0e;--fg:#f0f0f0;--accent:#00DC82;--bg-soft:#141414;--card:#171717;--muted:#b0b0b0;--border:#262626;--shadow:0 10px 30px rgba(0,0,0,.5);--hover-bg:#1f1f1f;--hover-border:#333333;--hover-ring:rgba(176,176,176,.25);color-scheme:dark}`
-        }
-      ],
-      script: [
-        {
-          key: 'theme-inline-early',
-          tagPosition: 'head',
-          // Full inline logic: set data-theme and meta[name="theme-color"] with no network
-          children: `(function(){try{var w=window,d=document,e=d.documentElement,s=null;try{s=localStorage.getItem('theme')}catch(_){/* ignore */}var mql=w.matchMedia&&w.matchMedia('(prefers-color-scheme: dark)'),t=(s==='light'||s==='dark')?s:(mql&&mql.matches?'dark':'light');e.dataset.theme=t;var m=d.querySelector('meta[name="theme-color"]');if(!m){m=d.createElement('meta');m.setAttribute('name','theme-color');d.head.appendChild(m);}m.setAttribute('content',t==='dark'?'#0e0e0e':'#ffffff');}catch(_){/* ignore */}})();`
-        }
-      ]
+      // No inline script/styles to avoid theme switching during first render
     }
   },
   modules: [
