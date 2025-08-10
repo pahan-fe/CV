@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   srcDir: 'app',
   pages: true,
-  css: ['~/assets/css/reset.css'],
+  css: ['~/shared/styles/reset.css'],
   modules: [
     '@nuxt/eslint',
     ['@vite-pwa/nuxt', {

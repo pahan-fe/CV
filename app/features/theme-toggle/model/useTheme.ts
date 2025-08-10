@@ -14,7 +14,6 @@ export function useTheme() {
   }
 
   if (typeof window !== 'undefined') {
-    // Initialize from storage or prefers-color-scheme
     const stored = (localStorage.getItem(STORAGE_KEY) as Theme | null)
     if (stored === 'light' || stored === 'dark') {
       theme.value = stored

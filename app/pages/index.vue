@@ -1,103 +1,10 @@
 <script setup lang="ts">
-import { useTheme } from '~/composables/useTheme'
-const { theme, toggleTheme } = useTheme()
-type Project = { title: string; period?: string; details: string[] }
-type Experience = { role: string; company: string; period: string; details?: string[]; projects?: Project[] }
-type Education = { school: string; degree: string; location?: string; period: string; details?: string[] }
-
-const profile = {
-  name: 'Pavel Zagvozdin',
-  role: 'JavaScript/TypeScript Developer',
-  email: 'mailto:zagvzdin.pakhan.webdev@gmail.com',
-  linkedin: 'https://www.linkedin.com/in/pahanz/',
-}
-
-const languages = [
-  'English (B2)', 'Russian (native)', 'Japanese (N5)',
-]
-
-const skills = [
-  // Programming
-  'JavaScript (JS)', 'TypeScript (TS)',
-  // Frontend frameworks & libs
-  'React', 'Redux', 'Redux Toolkit', 'Zustand', 'React Router', 'TanStack Query', 'TanStack Router',
-  'Vue', 'Vuex', 'Vue Router', 'NestJS',
-  // Tooling & platforms
-  'Git', 'Node.js', 'CI/CD', 'Azure', 'S3', 'single-spa', 'importmap', 'systemjs', 'Yarn', 'Vite', 'Webpack',
-  // UI & styling
-  'HTML', 'CSS', 'CSS Modules', 'Styled Components', 'Ant Design (Antd)', 'Bootstrap', 'SASS/SCSS', 'Stylus',
-  // Other
-  'codegen', 'PUG', 'jQuery', 'Gulp', 'Flow'
-]
-
-const experience: Experience[] = [
-  {
-    role: 'Frontend Developer',
-    company: 'Dodo Brands',
-    period: 'November 2021 – Present',
-    projects: [
-      {
-        title: 'Core team',
-        details: [
-          'Created and supported internal boilerplate tools for frontend developers (reduced project start from 5h to 1m).',
-          'Implemented 3 custom ESLint rules for styled-components.',
-          'Built 1 Yarn plugin to enforce Node.js version across projects.',
-          'Developed 2 Vite plugins (service worker generation and HTML correction).',
-          'Set up GitHub Actions for version publish and deploy; reduced pipeline time from ~20m to ~1.5m.',
-          'Delivered ~20 B2B interfaces.',
-          'Stack: React, TypeScript, React Router, TanStack Router/Query, Redux Toolkit, Zustand, Styled Components, Ant Design, Git.',
-        ],
-      },
-      {
-        title: 'Self service kiosk',
-        details: [
-          'Completed the first project stage; architected combo flow and cart layout.',
-          'Designed menu layout, page transition animations, and shopwindow slider.',
-          'Stack: React, Redux Toolkit, TypeScript, codegen, CSS/Styled Components, Git.',
-        ],
-      },
-    ],
-  },
-  {
-    role: 'Frontend Developer',
-    company: 'Sber-Korus',
-    period: 'January 2019 – September 2021',
-    details: [
-      'Section for legal entities: implemented “pledge” step; redesigned “Main data”; simplified “Withdrawal”.',
-      'Worked in a cross-functional team of 7 (2 FE, 2 BE, 2 QA, 1 PM).',
-      'VAT refund project delivered for a major bank.',
-      'Stack: React, Redux, Redux-Saga, Flow, TypeScript, HTML, CSS, SASS.',
-    ],
-  },
-  {
-    role: 'Software Engineering Specialist',
-    company: 'Neolant-West',
-    period: 'May 2018 – December 2018',
-    details: [
-      'Implemented 5 sections of a geo‑information system.',
-      'Stack: HTML, PUG, SASS, Bootstrap, Stylus, Vue, Vuex, Vue Router, Node.js, Git.',
-    ],
-  },
-  {
-    role: 'Web Developer',
-    company: 'Fibernet',
-    period: 'August 2017 – May 2018',
-    details: [
-      'Built websites for client companies; collaborated with a copywriter.',
-      'Stack: HTML, SASS, Bootstrap, JS, jQuery, Gulp.',
-    ],
-  },
-]
-
-const education: Education[] = [
-  {
-    school: 'Saint Petersburg State University of Aerospace and Instrumentation',
-    degree: 'Master’s degree',
-    location: 'Saint Petersburg',
-    period: 'June 2015',
-    details: ['Information Technology']
-  }
-]
+import ThemeToggle from '../features/theme-toggle/ui/ThemeToggle.vue'
+import { profile } from '../entities/profile'
+import { experience } from '../entities/experience'
+import { education } from '../entities/education'
+import { skills } from '../entities/skills'
+import { languages } from '../entities/languages'
 </script>
 
 <template>
@@ -109,24 +16,10 @@ const education: Education[] = [
       </div>
       <nav class="hero__nav">
         <a href="#experience">Experience</a>
-  <a href="#education">Education</a>
+        <a href="#education">Education</a>
         <a href="#languages">Languages</a>
         <a href="#contact">Contact</a>
-        <button
-          class="theme"
-          type="button"
-          :aria-label="theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
-          :title="theme === 'light' ? 'Dark theme' : 'Light theme'"
-          @click="toggleTheme()"
-        >
-          <svg v-if="theme === 'light'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="4"/>
-            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-          </svg>
-          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
-          </svg>
-        </button>
+        <ThemeToggle />
       </nav>
     </header>
 
@@ -251,29 +144,7 @@ const education: Education[] = [
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--muted) 35%, transparent);
 }
-.hero__nav .theme {
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--fg);
-  border-radius: 999px;
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
-}
-.hero__nav .theme:hover {
-  border-color: color-mix(in srgb, var(--muted) 40%, var(--border));
-  background: color-mix(in srgb, var(--muted) 14%, var(--bg));
-  transform: translateY(-1px);
-}
-.hero__nav .theme:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--muted) 35%, transparent);
-}
+  /* Theme toggle styles live in the feature component */
 
 .sidebar { grid-area: sidebar; position: relative; }
 .content { grid-area: content; display: grid; gap: 24px; }
@@ -343,7 +214,7 @@ const education: Education[] = [
   .hero { flex-direction: column; align-items: flex-start; }
   .hero__nav { overflow-x: auto; padding-bottom: 2px; }
   .hero__nav a { padding: 7px 10px; }
-  .hero__nav .theme { width: 34px; height: 34px; }
+  /* Theme toggle now styled like nav pills; no fixed square size */
   .content { gap: 20px; }
   .card { padding: 14px; border-radius: 12px; }
   .tag { font-size: 0.85rem; padding: 5px 10px; }
@@ -353,7 +224,6 @@ const education: Education[] = [
   .cv { max-width: 560px; padding: 24px 12px 48px; }
   .hero__id .name { font-size: 1.6rem; }
   .hero__nav a { padding: 6px 10px; }
-  .hero__nav .theme { width: 32px; height: 32px; }
   .card { padding: 12px; }
   .list { gap: 6px; }
 }
