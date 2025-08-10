@@ -7,6 +7,12 @@ export default defineNuxtConfig({
   ssr: true,
   pages: true,
   css: ['~/shared/ui/reset.css'],
+  // Auto-import Vue components from FSD locations
+  components: [
+    { path: '~/shared/ui', pathPrefix: false },
+    // Enable using feature UI components like <ThemeToggle /> without import
+    { path: '~/features', pathPrefix: true }
+  ],
   app: {
     head: {
       // Default to dark to avoid first-render flip
