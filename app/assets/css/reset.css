@@ -1,0 +1,45 @@
+/* Minimal modern CSS reset */
+
+/* Box sizing and margin reset */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+/* Height and typography defaults */
+html, body { height: 100%; }
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Media defaults */
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+
+/* Form element defaults */
+input, button, textarea, select { font: inherit; }
+button { background: none; border: 0; color: inherit; }
+
+/* Text wrapping */
+p, h1, h2, h3, h4, h5, h6 { overflow-wrap: anywhere; }
+
+/* Root app isolation for stacking contexts */
+#app, #__nuxt { isolation: isolate; }
+
+/* Theme variables */
+:root {
+  --bg: #ffffff;
+  --fg: #020420;
+  --accent: #00DC82;
+  --bg-soft: #f5f7fa;
+  --card: #f3f6fb;
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  --bg: #020420;
+  --fg: #eaf1ff;
+  --accent: #00DC82;
+  --bg-soft: #02062a;
+  --card: #02062a;
+  color-scheme: dark;
+}
