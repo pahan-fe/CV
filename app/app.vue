@@ -11,15 +11,15 @@ import { useTheme } from '~/features/theme-toggle/model/useTheme'
 const { theme } = useTheme()
 const metaThemeColor = computed(() => (theme.value === 'dark' ? '#0e0e0e' : '#ffffff'))
 
-// Use a blank favicon in production to avoid Nuxt default icon
+// Use a custom laptop favicon in production to avoid Nuxt default icon
 const faviconLinks = import.meta.dev
   ? [
       { rel: 'icon', href: '/favicon.ico' },
       { rel: 'shortcut icon', href: '/favicon.ico' }
     ]
   : [
-      // 1x1 transparent PNG
-      { rel: 'icon', type: 'image/png', href: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=' }
+  // SVG laptop icon (monotone)
+  { rel: 'icon', type: 'image/svg+xml', sizes: 'any', href: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236b7280"><path d="M4 6h16a1 1 0 0 1 1 1v9H3V7a1 1 0 0 1 1-1z"/><path d="M2 18h20v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/></svg>' }
     ]
 
 // Online/offline state for showing an in-app banner
