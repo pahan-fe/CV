@@ -11,12 +11,30 @@ export default defineNuxtConfig({
     head: {
       // Default to light; an inline script below will flip to dark if needed
       htmlAttrs: { lang: 'en', 'data-theme': 'light' },
+      // Minimal inline CSS to avoid white flash before CSS loads
+      style: [
+        {
+          key: 'theme-bg-inline',
+          tagPriority: 'critical',
+          children: `html{background-color:#ffffff;color-scheme:light} @media (prefers-color-scheme: dark){html{background-color:#0e0e0e;color-scheme:dark}} html[data-theme="dark"]{background-color:#0e0e0e;color-scheme:dark} html[data-theme="light"]{background-color:#ffffff;color-scheme:light} body{background:transparent}`
+        }
+      ],
       script: [
+        {
+          key: 'theme-inline-early',
+          tagPosition: 'head',
+          // Minimal inline to set attribute immediately; external script will refine meta, etc.
+          children: `(function(){try{var s=localStorage.getItem('theme');var t=(s==='light'||s==='dark')?s:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;}catch(_){}})();`
+        },
         {
           key: 'theme-init',
           tagPosition: 'head',
           // Early theme selection before hydration
-          src: '/theme-init.js'
+          src: '/theme-init.js',
+          // Ensure it runs as early as possible
+          defer: false,
+          async: false,
+          tagPriority: 'critical'
         }
       ]
     }
