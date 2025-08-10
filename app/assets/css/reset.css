@@ -12,6 +12,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Smooth scrolling for in-page anchors */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 /* Media defaults */
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
 
@@ -30,16 +36,22 @@ p, h1, h2, h3, h4, h5, h6 { overflow-wrap: anywhere; }
   --bg: #ffffff;
   --fg: #020420;
   --accent: #00DC82;
-  --bg-soft: #f5f7fa;
-  --card: #f3f6fb;
+  --bg-soft: #f6f8fb;
+  --card: #ffffff;
+  --muted: #5b6575;
+  --border: #e6eaf0;
+  --shadow: 0 10px 30px rgba(2, 4, 32, 0.06);
   color-scheme: light;
 }
 
 html[data-theme='dark'] {
-  --bg: #020420;
-  --fg: #eaf1ff;
-  --accent: #00DC82;
-  --bg-soft: #02062a;
-  --card: #02062a;
+  --bg: #0e0e0e;        /* page background */
+  --fg: #f0f0f0;        /* primary text */
+  --accent: #00DC82;    /* keep accent for brand highlights */
+  --bg-soft: #141414;   /* subtle gradient stop */
+  --card: #171717;      /* surfaces/cards */
+  --muted: #b0b0b0;     /* secondary text */
+  --border: #262626;    /* borders/dividers */
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }

@@ -1,11 +1,15 @@
 <script setup lang="ts">
-type Experience = { role: string; company: string; period: string; details: string[] }
+import { useTheme } from '~/composables/useTheme'
+const { theme, toggleTheme } = useTheme()
+type Project = { title: string; period?: string; details: string[] }
+type Experience = { role: string; company: string; period: string; details?: string[]; projects?: Project[] }
+type Education = { school: string; degree: string; location?: string; period: string; details?: string[] }
 
 const profile = {
   name: 'Pavel Zagvozdin',
   role: 'JavaScript/TypeScript Developer',
   email: 'mailto:zagvzdin.pakhan.webdev@gmail.com',
-  linkedin: 'https://linkedin.com/pahanz',
+  linkedin: 'https://www.linkedin.com/in/pahanz/',
 }
 
 const languages = [
@@ -28,27 +32,30 @@ const skills = [
 
 const experience: Experience[] = [
   {
-    role: 'Frontend Developer (Core team)',
+    role: 'Frontend Developer',
     company: 'Dodo Brands',
     period: 'November 2021 – Present',
-    details: [
-      'Created and supported internal boilerplate tools for frontend developers (reduced project start from 5h to 1m).',
-      'Implemented 3 custom ESLint rules for styled-components.',
-      'Built 1 Yarn plugin to enforce Node.js version across projects.',
-      'Developed 2 Vite plugins (service worker generation and HTML correction).',
-      'Set up GitHub Actions for version publish and deploy; reduced pipeline time from ~20m to ~1.5m.',
-      'Delivered ~20 B2B interfaces.',
-      'Stack: React, TypeScript, React Router, TanStack Router/Query, Redux Toolkit, Zustand, Styled Components, Ant Design, Git.',
-    ],
-  },
-  {
-    role: 'Frontend Developer (Self service kiosk)',
-    company: 'Dodo Brands',
-    period: '—',
-    details: [
-      'Completed the first project stage; architected combo flow and cart layout.',
-      'Designed menu layout, page transition animations, and shopwindow slider.',
-      'Stack: React, Redux Toolkit, TypeScript, codegen, CSS/Styled Components, Git.',
+    projects: [
+      {
+        title: 'Core team',
+        details: [
+          'Created and supported internal boilerplate tools for frontend developers (reduced project start from 5h to 1m).',
+          'Implemented 3 custom ESLint rules for styled-components.',
+          'Built 1 Yarn plugin to enforce Node.js version across projects.',
+          'Developed 2 Vite plugins (service worker generation and HTML correction).',
+          'Set up GitHub Actions for version publish and deploy; reduced pipeline time from ~20m to ~1.5m.',
+          'Delivered ~20 B2B interfaces.',
+          'Stack: React, TypeScript, React Router, TanStack Router/Query, Redux Toolkit, Zustand, Styled Components, Ant Design, Git.',
+        ],
+      },
+      {
+        title: 'Self service kiosk',
+        details: [
+          'Completed the first project stage; architected combo flow and cart layout.',
+          'Designed menu layout, page transition animations, and shopwindow slider.',
+          'Stack: React, Redux Toolkit, TypeScript, codegen, CSS/Styled Components, Git.',
+        ],
+      },
     ],
   },
   {
@@ -81,16 +88,49 @@ const experience: Experience[] = [
     ],
   },
 ]
+
+const education: Education[] = [
+  {
+    school: 'Saint Petersburg State University of Aerospace and Instrumentation',
+    degree: 'Master’s degree',
+    location: 'Saint Petersburg',
+    period: 'June 2015',
+    details: ['Information Technology']
+  }
+]
 </script>
 
 <template>
   <main class="cv">
+    <header class="hero">
+      <div class="hero__id">
+        <h1 class="name">{{ profile.name }}</h1>
+        <p class="role">{{ profile.role }}</p>
+      </div>
+      <nav class="hero__nav">
+        <a href="#experience">Experience</a>
+  <a href="#education">Education</a>
+        <a href="#languages">Languages</a>
+        <a href="#contact">Contact</a>
+        <button
+          class="theme"
+          type="button"
+          :aria-label="theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
+          :title="theme === 'light' ? 'Dark theme' : 'Light theme'"
+          @click="toggleTheme()"
+        >
+          <svg v-if="theme === 'light'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
     <aside class="sidebar">
-      <h1 class="name">{{ profile.name }}</h1>
-      <p class="role">{{ profile.role }}</p>
-
-      <div class="divider" />
-
       <section id="skills" class="block">
         <h2>Skills</h2>
         <ul class="tags">
@@ -108,8 +148,39 @@ const experience: Experience[] = [
               <h3 class="card__title">{{ item.role }} · {{ item.company }}</h3>
               <span class="card__period">{{ item.period }}</span>
             </header>
-            <ul class="card__list">
-              <li v-for="(d, j) in item.details" :key="j">{{ d }}</li>
+            <template v-if="item.details && item.details.length">
+              <ul class="card__list">
+                <li v-for="(d, j) in item.details" :key="j">{{ d }}</li>
+              </ul>
+            </template>
+            <template v-if="item.projects && item.projects.length">
+              <div class="subprojects">
+                <div v-for="(p, k) in item.projects" :key="k" class="sub">
+                  <div class="sub__head">
+                    <strong class="sub__title">{{ p.title }}</strong>
+                    <span v-if="p.period" class="sub__period">{{ p.period }}</span>
+                  </div>
+                  <ul class="card__list">
+                    <li v-for="(d, j) in p.details" :key="j">{{ d }}</li>
+                  </ul>
+                </div>
+              </div>
+            </template>
+          </article>
+        </div>
+      </section>
+
+      <section id="education" class="block">
+        <h2>Education</h2>
+        <div class="timeline">
+          <article v-for="(ed, i) in education" :key="i" class="card">
+            <header class="card__header">
+              <h3 class="card__title">{{ ed.school }}</h3>
+              <span class="card__period">{{ ed.period }}</span>
+            </header>
+            <p class="card__desc">{{ ed.degree }}<span v-if="ed.location"> · {{ ed.location }}</span></p>
+            <ul v-if="ed.details && ed.details.length" class="card__list">
+              <li v-for="(d, j) in ed.details" :key="j">{{ d }}</li>
             </ul>
           </article>
         </div>
@@ -135,48 +206,156 @@ const experience: Experience[] = [
 
 <style scoped>
 .cv {
-  max-width: 1024px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 32px 16px 64px;
+  padding: 40px 20px 80px;
   display: grid;
   grid-template-columns: 280px 1fr;
-  gap: 24px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'hero hero'
+    'sidebar content';
+  gap: 28px;
 }
 
-.sidebar { position: relative; }
-.name { font-size: 1.8rem; margin: 0 0 6px; color: var(--accent); }
-.role { opacity: 0.9; margin: 0 0 12px; }
-.summary { opacity: 0.9; }
-.divider { height: 1px; background: var(--accent); opacity: 0.4; margin: 16px 0; }
+.hero {
+  grid-area: hero;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.hero__id .name { font-size: 2rem; margin: 0; color: var(--fg); }
+.hero__id .role { margin: 4px 0 0; color: var(--muted); }
+.hero__nav { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero__nav a {
+  color: var(--fg);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 999px;
+  padding: 8px 12px;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.hero__nav a:hover {
+  border-color: color-mix(in srgb, var(--muted) 40%, var(--border));
+  background: color-mix(in srgb, var(--muted) 14%, var(--bg));
+  transform: translateY(-1px);
+}
+.hero__nav a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--muted) 35%, transparent);
+}
+.hero__nav .theme {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.hero__nav .theme:hover {
+  border-color: color-mix(in srgb, var(--muted) 40%, var(--border));
+  background: color-mix(in srgb, var(--muted) 14%, var(--bg));
+  transform: translateY(-1px);
+}
+.hero__nav .theme:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--muted) 35%, transparent);
+}
 
-.block { margin: 24px 0; }
-.block h2 { margin: 0 0 12px; font-size: 1.1rem; color: var(--accent); }
+.sidebar { grid-area: sidebar; position: relative; }
+.content { grid-area: content; display: grid; gap: 24px; }
 
-.list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.block { margin: 0; scroll-margin-top: 80px; }
+.block + .block { margin-top: 8px; }
+.block h2 { margin: 0 0 12px; font-size: 1.05rem; color: var(--muted); font-weight: 700; letter-spacing: 0.2px; }
+
+.list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .list a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
 
+/* Contact links in a row */
+#contact .list { display: inline-flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+#contact .list li { margin: 0; }
+
 .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
-.tags.small { gap: 6px; }
-.tag { border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 999px; font-size: 0.9rem; }
+.tag {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--fg);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow);
+}
 
-.content { display: grid; gap: 20px; }
 .timeline { display: grid; gap: 16px; }
-.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-
-.card { border: 1px solid var(--accent); border-radius: 12px; padding: 14px; background: var(--card); }
+.card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
 .card__header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .card__title { margin: 0; font-size: 1rem; }
 .card__period { opacity: 0.7; font-size: 0.9rem; }
 .card__list { margin: 8px 0 0 18px; }
 .card__desc { opacity: 0.9; margin: 8px 0; }
-
-.btn { background: var(--accent); color: var(--bg); padding: 8px 14px; border-radius: 8px; text-decoration: none; border: 1px solid var(--accent); }
-.btn.ghost { background: transparent; color: var(--accent); }
-.btn.small { padding: 6px 10px; font-size: 0.9rem; }
+.subprojects { display: grid; gap: 12px; margin-top: 8px; }
+.sub { border-top: 1px dashed var(--border); padding-top: 10px; }
+.sub__head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.sub__title { font-weight: 600; }
+.sub__period { opacity: 0.7; font-size: 0.9rem; }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .cv {
+    max-width: 1000px;
+    grid-template-columns: 220px 1fr;
+    gap: 24px;
+    padding: 32px 16px 64px;
+  }
+  .hero__id .name { font-size: 1.9rem; }
+}
+
 @media (max-width: 900px) {
-  .cv { grid-template-columns: 1fr; }
+  .cv {
+    max-width: 720px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'hero'
+  'sidebar'
+  'content';
+    gap: 20px;
+  }
+  .hero { flex-direction: column; align-items: flex-start; }
+  .hero__nav { overflow-x: auto; padding-bottom: 2px; }
+  .hero__nav a { padding: 7px 10px; }
+  .hero__nav .theme { width: 34px; height: 34px; }
+  .content { gap: 20px; }
+  .card { padding: 14px; border-radius: 12px; }
+  .tag { font-size: 0.85rem; padding: 5px 10px; }
+}
+
+@media (max-width: 600px) {
+  .cv { max-width: 560px; padding: 24px 12px 48px; }
+  .hero__id .name { font-size: 1.6rem; }
+  .hero__nav a { padding: 6px 10px; }
+  .hero__nav .theme { width: 32px; height: 32px; }
+  .card { padding: 12px; }
+  .list { gap: 6px; }
 }
 
 /* Print styles */

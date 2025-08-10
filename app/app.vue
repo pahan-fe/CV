@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import AppHeader from '../components/AppHeader.vue'
-import AppFooter from '../components/AppFooter.vue'
 // Compute the current absolute URL for canonical and OG url
 const url = useRequestURL()
 const siteName = 'Pavel Zagvozdin'
@@ -24,10 +22,16 @@ onBeforeUnmount(() => {
 })
 
 useHead({
-  // Title template for consistency across pages (if you add more routes later)
-  titleTemplate: (titleChunk?: string) => (titleChunk ? `${titleChunk} | ${siteName}` : siteName),
+  // Avoid duplicating the site name when a page title is already provided
+  titleTemplate: (titleChunk?: string) => (titleChunk ? titleChunk : siteName),
   link: [
-    { rel: 'canonical', href: url.href }
+  { rel: 'canonical', href: url.href },
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+  { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+  { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' },
+  // Use a blank favicon to avoid showing the Nuxt icon in the browser tab
+  { rel: 'icon', href: 'data:,' },
+  { rel: 'shortcut icon', href: 'data:,' }
   ]
 })
 
@@ -48,21 +52,20 @@ useSeoMeta({
 <template>
   <div id="app">
   <div v-if="!isOnline" class="offline-banner">You’re offline. Viewing cached content.</div>
-    <AppHeader />
     <div class="page">
       <NuxtPage />
     </div>
-    <AppFooter />
   </div>
 </template>
 
 <style scoped>
   #app {
-  background-color: var(--bg);
-  color: var(--fg);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+    color: var(--fg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   }
   .offline-banner {
     position: sticky;
