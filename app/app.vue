@@ -81,6 +81,7 @@ useSeoMeta({
   // Browser UI
   themeColor: metaThemeColor
 })
+import FirstRenderIntro from '~/shared/ui/FirstRenderIntro.vue'
 // First-render intro overlay (client-only)
 const showIntro = ref(false)
 

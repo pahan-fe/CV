@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import ThemeToggle from '../features/theme-toggle/ui/ThemeToggle.vue'
-import { profile } from '../entities/profile'
-import { experience } from '../entities/experience'
-import { education } from '../entities/education'
-import { skills } from '../entities/skills'
-import { languages } from '../entities/languages'
+import ThemeToggle from '~/features/theme-toggle/ui/ThemeToggle.vue'
+import { profile } from '~/entities/profile'
+import { experience } from '~/entities/experience'
+import { education } from '~/entities/education'
+import { skills } from '~/entities/skills'
+import { languages } from '~/entities/languages'
 
 // Page-level SEO
 const url = useRequestURL()

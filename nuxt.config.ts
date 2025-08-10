@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   // Use SSR in production; we'll provide a partial offline experience via SW
   ssr: true,
   pages: true,
-  css: ['~/shared/styles/reset.css'],
+  css: ['~/shared/ui/reset.css'],
   app: {
     head: {
       // Default to dark to avoid first-render flip
@@ -19,10 +19,10 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxt/eslint',
-  // SEO and discovery
-  '@nuxtjs/sitemap',
-  '@nuxtjs/robots',
-  'nuxt-schema-org',
+    // SEO and discovery
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots',
+    'nuxt-schema-org',
     ['@vite-pwa/nuxt', {
       registerType: 'autoUpdate',
       // Disable SW during development to avoid offline.html showing while online

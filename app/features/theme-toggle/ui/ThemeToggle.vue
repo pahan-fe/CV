@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTheme } from '../model/useTheme'
+import { useTheme } from '~/features/theme-toggle/model/useTheme'
 const { theme, toggleTheme } = useTheme()
 </script>
 
