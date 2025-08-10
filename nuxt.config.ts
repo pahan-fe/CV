@@ -5,6 +5,22 @@ export default defineNuxtConfig({
   srcDir: 'app',
   pages: true,
   css: ['~/shared/styles/reset.css'],
+  // Ensure theme is set as early as possible on the client to avoid a flash
+  // of incorrect theme when statically hosted (no SSR at runtime).
+  app: {
+    head: {
+      // Default to light; an inline script below will flip to dark if needed
+      htmlAttrs: { lang: 'en', 'data-theme': 'light' },
+      script: [
+        {
+          key: 'theme-init',
+          tagPosition: 'head',
+          // Early theme selection before hydration
+          src: '/theme-init.js'
+        }
+      ]
+    }
+  },
   modules: [
     '@nuxt/eslint',
   // SEO and discovery
