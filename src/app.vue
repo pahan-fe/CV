@@ -1,4 +1,9 @@
 <script setup lang="ts">
+// Explicit imports for TS type checking (Nuxt auto-imports at runtime)
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRuntimeConfig, useRequestURL, useRoute, useHead, useSeoMeta } from 'nuxt/app'
+import { useTheme } from './features/theme-toggle/model/useTheme'
+
 // Compute the current absolute URL for canonical and OG url
 const url = useRequestURL()
 const siteName = 'Pavel Zagvozdin — CV'
@@ -7,7 +12,6 @@ const route = useRoute()
 const canonical = computed(() => `${config.public.siteUrl}${route.path}`)
 const ogImage = computed(() => `${config.public.siteUrl}/og.png`)
 // Theme color for browser UI that matches current theme
-import { useTheme } from '~/features/theme-toggle/model/useTheme'
 const { theme } = useTheme()
 const metaThemeColor = computed(() => (theme.value === 'dark' ? '#0e0e0e' : '#ffffff'))
 
@@ -81,33 +85,10 @@ useSeoMeta({
   // Browser UI
   themeColor: metaThemeColor
 })
-import FirstRenderIntro from '~/shared/ui/FirstRenderIntro.vue'
-// First-render intro overlay (client-only)
-const showIntro = ref(false)
-
-if (process.client) {
-  // show only once per session and only if not set previously
-  const key = 'cv:intro:seen'
-  const seen = sessionStorage.getItem(key)
-  // Respect reduced motion preference
-  const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-  showIntro.value = !seen && !prefersReduced
-  if (showIntro.value) {
-    // ensure it won't repeat this session
-    sessionStorage.setItem(key, '1')
-  }
-}
-
-function handleIntroDone() {
-  showIntro.value = false
-}
 </script>
 
 <template>
   <div id="app">
-    <ClientOnly>
-      <FirstRenderIntro v-if="showIntro" @done="handleIntroDone" />
-    </ClientOnly>
   <div v-if="!isOnline" class="offline-banner">You’re offline. Viewing cached content.</div>
     <div class="page">
       <NuxtPage />
