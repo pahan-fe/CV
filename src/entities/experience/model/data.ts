@@ -3,58 +3,84 @@ import type { Experience } from './types'
 export const experience: Experience[] = [
   {
     role: 'Frontend Developer',
-    company: 'Dodo Brands',
+    company: 'Dodo Brands - international food-tech company',
     period: 'November 2021 – Present',
     projects: [
       {
-        title: 'Infrastructure team',
+        title: 'Core team',
         details: [
-          'Created and supported internal boilerplate tools for frontend developers (reduced project start from 5h to 1m).',
-          'Implemented 3 custom ESLint rules for styled-components.',
-          'Built 1 Yarn plugin to enforce Node.js version across projects.',
-          'Developed 2 Vite plugins (service worker generation and HTML correction).',
-          'Set up GitHub Actions for version publish and deploy, reduced pipeline time from ~20m to ~1.5m.',
-          'Delivered ~20 B2B interfaces.',
-          'Stack: React, TypeScript, React Router, TanStack Router/Query, Redux Toolkit, Zustand, Styled Components, Ant Design, Git.',
+          'Created and supported internal boilerplate tools for frontend developers.',
+          'Reduced project start time from 5 hours to 1 minute.',
+          'Developed 3 custom ESLint rules for styled-components files.',
+          'Created Yarn plugin to check Node.js version in projects.',
+          'Developed Vite plugin to generate service worker.',
+          'Developed Vite plugin to correct HTML files.',
+          'Implemented GitHub Action to publish version artifacts.',
+          'Implemented GitHub Action to deploy version artifacts.',
+          'Reduced CI/CD pipeline time from 20 minutes to 1.5 minutes.',
+          'Developed 30 B2B interfaces.',
         ],
       },
       {
         title: 'Self service kiosk',
         details: [
-          'Completed the first project stage.',
-          'Architected combo flow and cart layout, designed menu layout, page transition animations, and shopwindow slider.',
-          'Stack: React, Redux Toolkit, TypeScript, codegen, CSS/Styled Components, Git.',
+          'Completed first stage of project.',
+          'Architected and implemented combo meal selection feature.',
+          'Designed cart layout.',
+          'Designed menu layout.',
+          'Created animations between pages.',
+          'Developed shopwindow slider.',
         ],
       },
     ],
   },
   {
     role: 'Frontend Developer',
-    company: 'Sber-Korus',
+    company: 'Sber-Korus - fintech company',
     period: 'January 2019 – September 2021',
-    details: [
-      'Section for legal entities: implemented “pledge” step, redesigned “Main data”, simplified “Withdrawal”.',
-      'Worked in a cross-functional team of 7 (2 FE, 2 BE, 2 QA, 1 PM).',
-      'VAT refund project delivered for a major bank.',
-      'Stack: React, Redux, Redux-Saga, Flow, TypeScript, HTML, CSS, SASS.',
+    projects: [
+      {
+        title: 'Section for legal entities',
+        details: [
+          'Architected and implemented "pledge" step.',
+          'Redesigned "Main data" step.',
+          'Reduced the difficulty of "Withdrawal" step.',
+          'Worked in a cross-functional team of 7 (2 frontend, 2 backend, 2 QA, 1 product manager).',
+        ],
+      },
+      {
+        title: 'VAT refund project',
+        details: [
+          'Completed the project for one of the most famous banks.',
+        ],
+      },
     ],
   },
   {
     role: 'Software Engineering Specialist',
     company: 'Neolant-West',
     period: 'May 2018 – December 2018',
-    details: [
-      'Implemented 5 sections of a geo‑information system.',
-      'Stack: HTML, PUG, SASS, Bootstrap, Stylus, Vue, Vuex, Vue Router, Node.js, Git.',
+    projects: [
+      {
+        title: 'Product team',
+        details: [
+          'Implemented 5 sections of geo-information system.',
+        ],
+      },
     ],
   },
   {
     role: 'Web Developer',
     company: 'Fibernet',
     period: 'August 2017 – May 2018',
-    details: [
-      'Built websites for client companies, collaborated with a copywriter.',
-      'Stack: HTML, SASS, Bootstrap, JS, jQuery, Gulp.',
+    projects: [
+      {
+        title: 'Product team',
+        details: [
+          'Creation of sites for companies-customers.',
+          'Worked as a team with a copywriter.',
+        ],
+      },
     ],
   },
 ]

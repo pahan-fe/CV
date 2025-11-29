@@ -1,15 +1,12 @@
 import type { Skill } from './types'
 
 export const skills: Skill[] = [
-  // Programming
-  'JavaScript (JS)', 'TypeScript (TS)',
-  // Frontend frameworks & libs
-  'React', 'Redux', 'Redux Toolkit', 'Zustand', 'React Router', 'TanStack Query', 'TanStack Router',
-  'Vue', 'Vuex', 'Vue Router', 'NestJS',
-  // Tooling & platforms
-  'Git', 'Node.js', 'CI/CD', 'Azure', 'S3', 'single-spa', 'importmap', 'systemjs', 'Yarn', 'Vite', 'Webpack',
-  // UI & styling
-  'HTML', 'CSS', 'CSS Modules', 'Styled Components', 'Ant Design (Antd)', 'Bootstrap', 'SASS/SCSS', 'Stylus',
-  // Other
-  'codegen', 'PUG', 'jQuery', 'Gulp', 'Flow'
+  'JavaScript', 'TypeScript',
+  'HTML', 'CSS', 'SASS', 'LESS',
+  'React', 'Redux', 'Redux/toolkit', 'Zustand', 'React Router', 'Tanstack Query', 'Tanstack Router', 'i18next',
+  'Vue.js', 'Vuex', 'Vue Router', 'NestJs',
+  'Ant Design', 'Bootstrap', 'Styled-Components',
+  'Git', 'Node.js', 'Webpack', 'Vite', 'Vitest', 'Jest', 'Yarn',
+  'CI/CD (GitHub Actions)', 'Azure', 'S3',
+  'Micro-frontend', 'Single-spa', 'Importmap', 'Systemjs'
 ]
