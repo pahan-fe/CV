@@ -5,7 +5,6 @@ export const experience: Experience[] = [
     role: 'Frontend Developer',
     company: 'Dodo Brands - international food-tech company',
     period: 'November 2021 – Present',
-    location: 'Belgrade',
     projects: [
       {
         title: 'Core team',
@@ -50,7 +49,6 @@ export const experience: Experience[] = [
     role: 'Frontend Developer',
     company: 'Sber-Korus - fintech company',
     period: 'January 2019 – September 2021',
-    location: 'Saint-Petersburg',
     projects: [
       {
         title: 'Business clients section',
@@ -72,8 +70,7 @@ export const experience: Experience[] = [
   {
     role: 'Software Engineering Specialist',
     company: 'Neolant-West',
-    period: 'May 2018 - December 2018',
-    location: 'Saint-Petersburg',
+    period: 'May 2018 – December 2018',
     projects: [
       {
         title: 'Product team',
@@ -86,8 +83,7 @@ export const experience: Experience[] = [
   {
     role: 'Web Developer',
     company: 'Fibernet',
-    period: 'August 2017 - May 2018',
-    location: 'Saint-Petersburg',
+    period: 'August 2017 – May 2018',
     projects: [
       {
         title: 'Product team',

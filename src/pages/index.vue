@@ -72,7 +72,7 @@ useSchemaOrg([
           <article v-for="(item, i) in experience" :key="i" class="card">
             <header class="card__header">
               <h3 class="card__title">{{ item.role }} · {{ item.company }}</h3>
-              <span class="card__period">{{ item.period }}<span v-if="item.location"> · {{ item.location }}</span></span>
+              <span class="card__period">{{ item.period }}</span>
             </header>
             <template v-if="item.details && item.details.length">
               <ul class="card__list">
