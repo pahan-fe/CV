@@ -3,4 +3,5 @@ export type Profile = {
   role: string
   email: string
   linkedin: string
+  summary?: string
 }

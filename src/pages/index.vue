@@ -5,12 +5,13 @@ import { experience } from '~/entities/experience'
 import { education } from '~/entities/education'
 import { skills } from '~/entities/skills'
 import { languages } from '~/entities/languages'
+import { articles } from '~/entities/articles'
 
 // Page-level SEO
 const url = useRequestURL()
 useSeoMeta({
   title: `${profile.name} — ${profile.role}`,
-  description: `${profile.name} — ${profile.role}. Experience, skills, education and contacts.`
+  description: profile.summary || `${profile.name} — ${profile.role}. Experience, skills, education and contacts.`
 })
 
 // Schema.org
@@ -40,9 +41,11 @@ useSchemaOrg([
         <p class="role">{{ profile.role }}</p>
       </div>
       <nav class="hero__nav">
+        <a href="#summary">Summary</a>
         <a href="#experience">Experience</a>
         <a href="#education">Education</a>
         <a href="#languages">Languages</a>
+        <a href="#articles">Articles</a>
         <a href="#contact">Contact</a>
         <ThemeToggle />
       </nav>
@@ -58,13 +61,18 @@ useSchemaOrg([
     </aside>
 
     <section class="content">
+      <section v-if="profile.summary" id="summary" class="block">
+        <h2>Summary</h2>
+        <p class="summary">{{ profile.summary }}</p>
+      </section>
+
       <section id="experience" class="block">
         <h2>Experience</h2>
         <div class="timeline">
           <article v-for="(item, i) in experience" :key="i" class="card">
             <header class="card__header">
               <h3 class="card__title">{{ item.role }} · {{ item.company }}</h3>
-              <span class="card__period">{{ item.period }}</span>
+              <span class="card__period">{{ item.period }}<span v-if="item.location"> · {{ item.location }}</span></span>
             </header>
             <template v-if="item.details && item.details.length">
               <ul class="card__list">
@@ -108,6 +116,15 @@ useSchemaOrg([
         <h2>Languages</h2>
         <ul class="tags">
           <li v-for="l in languages" :key="l" class="tag">{{ l }}</li>
+        </ul>
+      </section>
+
+      <section id="articles" class="block">
+        <h2>Articles</h2>
+        <ul class="list">
+          <li v-for="article in articles" :key="article.url">
+            <a :href="article.url" target="_blank" rel="noopener">{{ article.title }}</a>
+          </li>
         </ul>
       </section>
 
@@ -169,8 +186,6 @@ useSchemaOrg([
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--muted) 35%, transparent);
 }
-  /* Theme toggle styles live in the feature component */
-
 .sidebar { grid-area: sidebar; position: relative; }
 .content { grid-area: content; display: grid; gap: 24px; }
 
@@ -181,7 +196,6 @@ useSchemaOrg([
 .list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .list a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
 
-/* Contact links in a row */
 #contact .list { display: inline-flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 #contact .list li { margin: 0; }
 
@@ -209,13 +223,13 @@ useSchemaOrg([
 .card__period { opacity: 0.7; font-size: 0.9rem; }
 .card__list { margin: 8px 0 0 18px; }
 .card__desc { opacity: 0.9; margin: 8px 0; }
+.summary { opacity: 0.9; margin: 0; line-height: 1.6; }
 .subprojects { display: grid; gap: 12px; margin-top: 8px; }
 .sub { border-top: 1px dashed var(--border); padding-top: 10px; }
 .sub__head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .sub__title { font-weight: 600; }
 .sub__period { opacity: 0.7; font-size: 0.9rem; }
 
-/* Responsive */
 @media (max-width: 1200px) {
   .cv {
     max-width: 1000px;
@@ -230,16 +244,12 @@ useSchemaOrg([
   .cv {
     max-width: 720px;
     grid-template-columns: 1fr;
-    grid-template-areas:
-      'hero'
-  'sidebar'
-  'content';
+    grid-template-areas: 'hero' 'sidebar' 'content';
     gap: 20px;
   }
   .hero { flex-direction: column; align-items: flex-start; }
   .hero__nav { overflow-x: auto; padding-bottom: 2px; }
   .hero__nav a { padding: 7px 10px; }
-  /* Theme toggle now styled like nav pills; no fixed square size */
   .content { gap: 20px; }
   .card { padding: 14px; border-radius: 12px; }
   .tag { font-size: 0.85rem; padding: 5px 10px; }
@@ -253,7 +263,6 @@ useSchemaOrg([
   .list { gap: 6px; }
 }
 
-/* Print styles */
 @media print {
   .cv { max-width: 800px; padding: 0; gap: 16px; }
   .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

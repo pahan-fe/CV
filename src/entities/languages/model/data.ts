@@ -1,5 +1,5 @@
 import type { Language } from './types'
 
 export const languages: Language[] = [
-  'English (B2)', 'Russian (native)', 'Japanese (N5)'
+  'English (Business level, TOEIC 825)', 'Russian (native)', 'Japanese (N5)'
 ]

@@ -5,31 +5,43 @@ export const experience: Experience[] = [
     role: 'Frontend Developer',
     company: 'Dodo Brands - international food-tech company',
     period: 'November 2021 – Present',
+    location: 'Belgrade',
     projects: [
       {
         title: 'Core team',
         details: [
-          'Created and supported internal boilerplate tools for frontend developers.',
-          'Reduced project start time from 5 hours to 1 minute.',
-          'Developed 3 custom ESLint rules for styled-components files.',
-          'Created Yarn plugin to check Node.js version in projects.',
-          'Developed Vite plugin to generate service worker.',
-          'Developed Vite plugin to correct HTML files.',
-          'Implemented GitHub Action to publish version artifacts.',
-          'Implemented GitHub Action to deploy version artifacts.',
-          'Reduced CI/CD pipeline time from 20 minutes to 1.5 minutes.',
-          'Developed 30 B2B interfaces.',
+          'Automated project setup and reduced onboarding from 5 hours → 1 minute.',
+          'Improved pipeline performance from 20 minutes → 1.5 minutes on average.',
+          'Built and maintained internal tooling ecosystem for frontend teams (Node.js).',
+          'Created custom ESLint rules, a Yarn plugin for Node.js version checks, and Vite plugins (service worker generation, HTML adjustments).',
+          'Developed CI/CD workflows and GitHub Actions (Node.js, Azure, S3).',
+          'Delivered ~30 internal B2B interfaces used across the company.',
+          'Worked with microfrontends: single-spa, importmap, systemjs, native imports.',
+          'Improved frontend performance through code-splitting, lazy loading and bundle optimization.',
         ],
       },
       {
-        title: 'Self service kiosk',
+        title: 'Redesign project',
         details: [
-          'Completed first stage of project.',
-          'Architected and implemented combo meal selection feature.',
-          'Designed cart layout.',
-          'Designed menu layout.',
-          'Created animations between pages.',
-          'Developed shopwindow slider.',
+          'Rebuilt ~15 legacy interfaces, migrating them from Razor + jQuery to a React-based micro-frontend architecture.',
+          'Restructured the frontend codebase to reduce complexity and speed up development.',
+          'Designed scalable UI architecture and reusable components for the redesigned interfaces.',
+          'Collaborated on backend redesign and refactored key C# API endpoints for cleaner contracts, better performance, and smoother frontend integration.',
+        ],
+      },
+      {
+        title: 'Self service kiosk project',
+        details: [
+          'Delivered core architecture, cart flow, combo logic and menu layout.',
+          'Built page-to-page animations and a shop-window slider.',
+        ],
+      },
+      {
+        title: 'Additional',
+        details: [
+          'Participated in technical interviews for frontend and full-stack candidates.',
+          'Assisted in onboarding new frontend developers, including code reviews and mentorship support.',
+          'Light backend work with NestJS (internal dashboard for microfrontend versions).',
         ],
       },
     ],
@@ -38,11 +50,12 @@ export const experience: Experience[] = [
     role: 'Frontend Developer',
     company: 'Sber-Korus - fintech company',
     period: 'January 2019 – September 2021',
+    location: 'Saint-Petersburg',
     projects: [
       {
-        title: 'Section for legal entities',
+        title: 'Business clients section',
         details: [
-          'Architected and implemented "pledge" step.',
+          'Architected and implemented the "pledge" step for a large enterprise onboarding flow.',
           'Redesigned "Main data" step.',
           'Reduced the difficulty of "Withdrawal" step.',
           'Worked in a cross-functional team of 7 (2 frontend, 2 backend, 2 QA, 1 product manager).',
@@ -59,12 +72,13 @@ export const experience: Experience[] = [
   {
     role: 'Software Engineering Specialist',
     company: 'Neolant-West',
-    period: 'May 2018 – December 2018',
+    period: 'May 2018 - December 2018',
+    location: 'Saint-Petersburg',
     projects: [
       {
         title: 'Product team',
         details: [
-          'Implemented 5 sections of geo-information system.',
+          'Implemented 5 sections of geo-information system using Vue.js, Vuex, Vue Router.',
         ],
       },
     ],
@@ -72,7 +86,8 @@ export const experience: Experience[] = [
   {
     role: 'Web Developer',
     company: 'Fibernet',
-    period: 'August 2017 – May 2018',
+    period: 'August 2017 - May 2018',
+    location: 'Saint-Petersburg',
     projects: [
       {
         title: 'Product team',
