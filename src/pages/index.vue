@@ -403,17 +403,48 @@ onMounted(() => {
 }
 
 .card {
+  position: relative;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
   background: var(--card);
   overflow-wrap: anywhere;
-  transition: border-color 250ms, box-shadow 250ms;
+  transition: border-color 300ms;
 }
 
-.card:hover {
-  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
-  box-shadow: var(--glow);
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    var(--fg) 5%,
+    transparent 15%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+.card:hover::before {
+  opacity: 1;
+  animation: border-spin 2.5s linear infinite;
+}
+
+@keyframes border-spin {
+  to { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 .card__header {
@@ -501,6 +532,7 @@ onMounted(() => {
 }
 
 .tag {
+  position: relative;
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--muted);
@@ -508,13 +540,36 @@ onMounted(() => {
   border-radius: 6px;
   font-size: 0.8rem;
   font-family: 'JetBrains Mono', monospace;
-  transition: transform 200ms, border-color 200ms, color 200ms;
+  transition: color 200ms;
+}
+
+.tag::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 7px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    var(--fg) 5%,
+    transparent 15%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 300ms;
 }
 
 .tag:hover {
-  transform: scale(1.05);
-  border-color: var(--accent);
   color: var(--fg);
+}
+
+.tag:hover::before {
+  opacity: 1;
+  animation: border-spin 2s linear infinite;
 }
 
 .articles-list {
