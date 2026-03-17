@@ -1,32 +1,38 @@
-# CV
+# Pavel Zagvozdin — CV
 
-This is a personal resume website built with Nuxt 4.
+Personal CV website built with Nuxt 4, TypeScript, and Canvas 2D effects.
 
-## SEO
+**Live:** [pahanz.dev](https://www.pahanz.dev/)
 
-- Set your production domain for correct canonical URLs and sitemap:
-	- Locally: export NUXT_SITE_URL=http://localhost:3000
-	- In production: set environment variable NUXT_SITE_URL=https://your-domain.tld
-- Robots and sitemap are generated automatically at /robots.txt and /sitemap.xml.
-- Schema.org (Person, WebSite, WebPage) is embedded on the home page.
+## Tech Stack
+
+- **Framework:** Nuxt 4, Vue 3, TypeScript
+- **Fonts:** Darker Grotesque, DM Sans, JetBrains Mono
+- **Effects:** Canvas 2D (starfield / symbiotes), CSS conic-gradient animations
+- **PWA:** Offline support via Workbox
+- **SEO:** Schema.org, Open Graph, sitemap, robots.txt
+- **Deploy:** Vercel
 
 ## Setup
 
-Install dependencies and run the dev server:
-
-```sh
-yarn
+```bash
+yarn install
 yarn dev
 ```
 
-Build for production:
+## Build
 
-```sh
+```bash
 yarn build
+node .output/server/index.mjs
 ```
 
-Preview the production build:
+## Scripts
 
-```sh
-yarn preview
-```
+| Command | Description |
+|---------|-------------|
+| `yarn dev` | Development server |
+| `yarn build` | Production build |
+| `yarn preview` | Preview production build |
+| `yarn lint` | Run ESLint |
+| `yarn typecheck` | Run type checking |
