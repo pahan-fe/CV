@@ -17,8 +17,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - run: yarn install --immutable
-      - run: yarn nuxt prepare
+      - run: yarn install
       - run: yarn lint
       - run: yarn typecheck
       - run: yarn build
