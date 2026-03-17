@@ -30,10 +30,14 @@ const activeSection = ref(sections[0])
 const navRef = ref<HTMLElement>()
 const indicatorStyle = ref({ top: '0px', height: '0px', opacity: '0' })
 
-function updateIndicator() {
-  if (!navRef.value) return
+const updateIndicator = () => {
+  if (!navRef.value) {
+    return
+  }
   const link = navRef.value.querySelector(`[data-section="${activeSection.value}"]`) as HTMLElement | null
-  if (!link) return
+  if (!link) {
+    return
+  }
   const navRect = navRef.value.getBoundingClientRect()
   const linkRect = link.getBoundingClientRect()
   indicatorStyle.value = {
@@ -55,13 +59,15 @@ onMounted(() => {
     typedRole.value = text.slice(0, ++i)
     if (i >= text.length) {
       clearInterval(interval)
-      setTimeout(() => { showCursor.value = false }, 1500)
+      setTimeout(() => {
+        showCursor.value = false
+      }, 1500)
     }
   }, 60)
 })
 
 onMounted(() => {
-  function onScroll() {
+  const onScroll = () => {
     const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 50
 
     if (atBottom) {
@@ -85,7 +91,9 @@ onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   onScroll()
 
-  onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+  onBeforeUnmount(() => {
+    window.removeEventListener('scroll', onScroll)
+  })
 
   nextTick(updateIndicator)
 })

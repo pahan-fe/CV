@@ -27,15 +27,23 @@ let onOffline: () => void
 
 onMounted(() => {
   isOnline.value = navigator.onLine
-  onOnline = () => { isOnline.value = true }
-  onOffline = () => { isOnline.value = false }
+  onOnline = () => {
+    isOnline.value = true
+  }
+  onOffline = () => {
+    isOnline.value = false
+  }
   window.addEventListener('online', onOnline)
   window.addEventListener('offline', onOffline)
 })
 
 onBeforeUnmount(() => {
-  if (onOnline) window.removeEventListener('online', onOnline)
-  if (onOffline) window.removeEventListener('offline', onOffline)
+  if (onOnline) {
+    window.removeEventListener('online', onOnline)
+  }
+  if (onOffline) {
+    window.removeEventListener('offline', onOffline)
+  }
 })
 
 useHead({

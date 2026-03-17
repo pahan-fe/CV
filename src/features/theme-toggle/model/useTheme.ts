@@ -6,16 +6,20 @@ export type Theme = 'light' | 'dark'
 const theme = ref<Theme>('dark')
 let initialized = false
 
-function apply(t: Theme) {
+const apply = (t: Theme) => {
   if (typeof document !== 'undefined') {
     document.documentElement.dataset.theme = t
     const meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null
-    if (meta) meta.setAttribute('content', THEME_COLORS[t])
+    if (meta) {
+      meta.setAttribute('content', THEME_COLORS[t])
+    }
   }
 }
 
-function init() {
-  if (initialized || typeof window === 'undefined') return
+const init = () => {
+  if (initialized || typeof window === 'undefined') {
+    return
+  }
   initialized = true
 
   try {
@@ -23,7 +27,7 @@ function init() {
     if (s === 'light' || s === 'dark') {
       theme.value = s
     }
-  } catch {}
+  } catch { /* ignored */ }
   apply(theme.value)
 }
 
@@ -34,7 +38,7 @@ export function useTheme() {
     theme.value = theme.value === 'dark' ? 'light' : 'dark'
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme.value)
-    } catch {}
+    } catch { /* ignored */ }
     apply(theme.value)
   }
 

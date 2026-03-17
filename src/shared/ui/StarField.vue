@@ -33,27 +33,25 @@ interface Symbiote {
   tentacles: Tentacle[]
 }
 
-function createTentacle(): Tentacle {
-  return {
-    angle: Math.random() * Math.PI * 2,
-    maxLen: 30 + Math.random() * 60,
-    len: 0,
-    phase: 'wait',
-    timer: 0,
-    wait: 1000 + Math.random() * 5000,
-    speed: 0.2 + Math.random() * 0.3,
-    wave: 5 + Math.random() * 10,
-    freq: 0.04 + Math.random() * 0.04,
-    thick: 1 + Math.random() * 1.5,
-  }
-}
+const createTentacle = (): Tentacle => ({
+  angle: Math.random() * Math.PI * 2,
+  maxLen: 30 + Math.random() * 60,
+  len: 0,
+  phase: 'wait',
+  timer: 0,
+  wait: 1000 + Math.random() * 5000,
+  speed: 0.2 + Math.random() * 0.3,
+  wave: 5 + Math.random() * 10,
+  freq: 0.04 + Math.random() * 0.04,
+  thick: 1 + Math.random() * 1.5,
+})
 
 interface Blob {
   ox: number; oy: number
   r: number; phase: number; speed: number
 }
 
-function createSymbiote(w: number, h: number): Symbiote {
+const createSymbiote = (w: number, h: number): Symbiote => {
   const blobCount = 3 + Math.floor(Math.random() * 3)
   const baseR = 10 + Math.random() * 16
   return {
@@ -76,16 +74,20 @@ function createSymbiote(w: number, h: number): Symbiote {
 
 onMounted(() => {
   const el = canvas.value
-  if (!el) return
+  if (!el) {
+    return
+  }
   const ctx = el.getContext('2d')
-  if (!ctx) return
+  if (!ctx) {
+    return
+  }
 
   let stars: Star[] = []
   let symbiotes: Symbiote[] = []
   let width = 0
   let height = 0
 
-  function resize() {
+  const resize = () => {
     width = el.offsetWidth
     height = el.offsetHeight
     el.width = width * devicePixelRatio
@@ -95,7 +97,7 @@ onMounted(() => {
     initSymbiotes()
   }
 
-  function initStars() {
+  const initStars = () => {
     const count = Math.floor((width * height) / 4000)
     stars = Array.from({ length: count }, () => ({
       x: Math.random() * width,
@@ -107,12 +109,12 @@ onMounted(() => {
     }))
   }
 
-  function initSymbiotes() {
+  const initSymbiotes = () => {
     const count = Math.max(4, Math.floor((width * height) / 150000))
     symbiotes = Array.from({ length: count }, () => createSymbiote(width, height))
   }
 
-  function drawStars(time: number) {
+  const drawStars = (time: number) => {
     for (const s of stars) {
       const flicker = (Math.sin(time * s.speed + s.phase) + 1) / 2
       const alpha = 0.3 + flicker * 0.7
@@ -128,7 +130,7 @@ onMounted(() => {
     }
   }
 
-  function drawSymbiotes(time: number, dt: number) {
+  const drawSymbiotes = (time: number, dt: number) => {
     for (const s of symbiotes) {
       const breathe = 1 + Math.sin(time * s.pulseSpeed + s.pulse) * 0.15
 
@@ -153,20 +155,31 @@ onMounted(() => {
         switch (t.phase) {
           case 'wait':
             t.timer += dt
-            if (t.timer >= t.wait) { t.phase = 'grow'; t.timer = 0 }
+            if (t.timer >= t.wait) {
+              t.phase = 'grow'
+              t.timer = 0
+            }
             break
           case 'grow':
             t.len += t.speed * dt * 0.06
-            if (t.len >= t.maxLen) { t.len = t.maxLen; t.phase = 'hold'; t.timer = 0 }
+            if (t.len >= t.maxLen) {
+              t.len = t.maxLen
+              t.phase = 'hold'
+              t.timer = 0
+            }
             break
           case 'hold':
             t.timer += dt
-            if (t.timer >= 600 + Math.random() * 400) { t.phase = 'shrink' }
+            if (t.timer >= 600 + Math.random() * 400) {
+              t.phase = 'shrink'
+            }
             break
           case 'shrink':
             t.len -= t.speed * dt * 0.04
             if (t.len <= 0) {
-              t.len = 0; t.phase = 'wait'; t.timer = 0
+              t.len = 0
+              t.phase = 'wait'
+              t.timer = 0
               t.wait = 2000 + Math.random() * 6000
               t.angle += (Math.random() - 0.5) * 1.5
               t.maxLen = 30 + Math.random() * 60
@@ -174,7 +187,9 @@ onMounted(() => {
             break
         }
 
-        if (t.len <= 1) continue
+        if (t.len <= 1) {
+          continue
+        }
 
         const steps = Math.ceil(t.len / 2)
         const startX = s.x + Math.cos(t.angle) * r * 0.6
@@ -205,7 +220,7 @@ onMounted(() => {
   }
 
   let lastTime = 0
-  function draw(time: number) {
+  const draw = (time: number) => {
     const dt = lastTime ? time - lastTime : 16
     lastTime = time
     ctx.clearRect(0, 0, width, height)
