@@ -27,6 +27,21 @@ useSchemaOrg([
 const sections = ['summary', 'experience', 'education', 'languages', 'articles', 'contact'] as const
 const activeSection = ref(sections[0])
 
+const typedRole = ref('')
+const showCursor = ref(true)
+
+onMounted(() => {
+  const text = profile.role
+  let i = 0
+  const interval = setInterval(() => {
+    typedRole.value = text.slice(0, ++i)
+    if (i >= text.length) {
+      clearInterval(interval)
+      setTimeout(() => { showCursor.value = false }, 1500)
+    }
+  }, 60)
+})
+
 onMounted(() => {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -52,8 +67,13 @@ onMounted(() => {
   <main class="cv">
     <header class="hero reveal">
       <div class="hero__id">
-        <h1 class="hero__name">{{ profile.name }}</h1>
-        <p class="hero__role">{{ profile.role }}</p>
+        <h1 class="hero__name">
+          <span class="hero__first">{{ profile.name.split(' ')[0] }}</span>
+          <span class="hero__last">{{ profile.name.split(' ').slice(1).join(' ') }}</span>
+        </h1>
+        <p class="hero__role">
+          <span>{{ typedRole }}</span><span v-if="showCursor" class="hero__cursor">|</span>
+        </p>
       </div>
       <ThemeToggle />
     </header>
@@ -192,26 +212,46 @@ onMounted(() => {
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 32px;
+  padding: 32px 0 40px;
   border-bottom: 1px solid var(--border);
   min-width: 0;
 }
 
 .hero__name {
-  font-family: 'Syne', sans-serif;
-  font-size: 2.6rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font-family: 'Darker Grotesque', sans-serif;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
   color: var(--fg);
 }
 
-.hero__role {
-  margin-top: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
+.hero__first {
+  display: block;
+  font-size: 4.5rem;
+}
+
+.hero__last {
+  display: block;
+  font-size: 4.5rem;
   color: var(--muted);
-  letter-spacing: 0.03em;
+}
+
+.hero__role {
+  margin-top: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  min-height: 1.4em;
+}
+
+.hero__cursor {
+  animation: blink 0.7s step-end infinite;
+  color: var(--muted);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
 }
 
 .sidebar {
@@ -267,7 +307,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Darker Grotesque', sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -559,7 +599,7 @@ onMounted(() => {
     padding-top: 0;
   }
 
-  .hero__name { font-size: 2.2rem; }
+  .hero__first, .hero__last { font-size: 3rem; }
 
   .timeline::before { left: 5px; }
   .timeline__entry { padding-left: 28px; }
@@ -570,7 +610,7 @@ onMounted(() => {
 
 @media (max-width: 600px) {
   .cv { padding: 24px 12px 48px; }
-  .hero__name { font-size: 1.8rem; }
+  .hero__first, .hero__last { font-size: 2.2rem; }
   .hero { flex-direction: column; align-items: flex-start; }
   .card { padding: 14px; }
   .tag { font-size: 0.75rem; padding: 3px 8px; }
