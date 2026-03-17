@@ -15,6 +15,13 @@ interface Star {
   speed: number; phase: number; color: number[]
 }
 
+interface ShootingStar {
+  x: number; y: number
+  vx: number; vy: number
+  len: number; life: number; maxLife: number
+  color: number[]
+}
+
 interface Tentacle {
   angle: number; maxLen: number; len: number
   phase: 'wait' | 'grow' | 'hold' | 'shrink'
@@ -83,9 +90,11 @@ onMounted(() => {
   }
 
   let stars: Star[] = []
+  let shootingStars: ShootingStar[] = []
   let symbiotes: Symbiote[] = []
   let width = 0
   let height = 0
+  let shootingTimer = 0
 
   const resize = () => {
     width = el.offsetWidth
@@ -126,6 +135,83 @@ onMounted(() => {
       ctx.beginPath()
       ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2)
       ctx.fillStyle = g
+      ctx.fill()
+    }
+  }
+
+  const spawnShootingStar = () => {
+    const edge = Math.random()
+    let x: number, y: number
+    if (edge < 0.7) {
+      x = Math.random() * width
+      y = -10
+    } else {
+      x = width + 10
+      y = Math.random() * height * 0.5
+    }
+    const angle = Math.PI * (0.15 + Math.random() * 0.25)
+    const speed = 4 + Math.random() * 6
+    const color = DARK_COLORS[Math.floor(Math.random() * DARK_COLORS.length)]!
+    shootingStars.push({
+      x, y,
+      vx: Math.cos(angle) * speed * (edge < 0.7 ? 1 : -1),
+      vy: Math.sin(angle) * speed,
+      len: 40 + Math.random() * 80,
+      life: 0,
+      maxLife: 800 + Math.random() * 1200,
+      color,
+    })
+  }
+
+  const drawShootingStars = (dt: number) => {
+    shootingTimer += dt
+    if (shootingTimer > 2000 + Math.random() * 4000) {
+      shootingTimer = 0
+      spawnShootingStar()
+    }
+
+    for (let i = shootingStars.length - 1; i >= 0; i--) {
+      const s = shootingStars[i]!
+      s.life += dt
+      s.x += s.vx * (dt / 16)
+      s.y += s.vy * (dt / 16)
+
+      const progress = s.life / s.maxLife
+      const alpha = progress < 0.1
+        ? progress / 0.1
+        : progress > 0.7
+          ? 1 - (progress - 0.7) / 0.3
+          : 1
+
+      if (s.life >= s.maxLife || s.x < -100 || s.x > width + 100 || s.y > height + 100) {
+        shootingStars.splice(i, 1)
+        continue
+      }
+
+      const [cr, cg, cb] = s.color
+      const speed = Math.sqrt(s.vx * s.vx + s.vy * s.vy)
+      const nx = -s.vx / speed
+      const ny = -s.vy / speed
+
+      const grad = ctx.createLinearGradient(s.x, s.y, s.x + nx * s.len, s.y + ny * s.len)
+      grad.addColorStop(0, `rgba(${cr},${cg},${cb},${alpha * 0.9})`)
+      grad.addColorStop(0.3, `rgba(${cr},${cg},${cb},${alpha * 0.4})`)
+      grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+
+      ctx.beginPath()
+      ctx.moveTo(s.x, s.y)
+      ctx.lineTo(s.x + nx * s.len, s.y + ny * s.len)
+      ctx.strokeStyle = grad
+      ctx.lineWidth = 1.5
+      ctx.lineCap = 'round'
+      ctx.stroke()
+
+      const headGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 3)
+      headGrad.addColorStop(0, `rgba(255,255,255,${alpha})`)
+      headGrad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+      ctx.beginPath()
+      ctx.arc(s.x, s.y, 3, 0, Math.PI * 2)
+      ctx.fillStyle = headGrad
       ctx.fill()
     }
   }
@@ -227,6 +313,7 @@ onMounted(() => {
 
     if (props.dark) {
       drawStars(time)
+      drawShootingStars(dt)
     } else {
       drawSymbiotes(time, dt)
     }
