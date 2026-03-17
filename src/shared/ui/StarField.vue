@@ -234,13 +234,37 @@ onMounted(() => {
     animationId = requestAnimationFrame(draw)
   }
 
+  const start = () => {
+    if (!animationId) {
+      animationId = requestAnimationFrame(draw)
+    }
+  }
+
+  const stop = () => {
+    if (animationId) {
+      cancelAnimationFrame(animationId)
+      animationId = 0
+    }
+  }
+
+  const onVisibility = () => {
+    if (document.hidden) {
+      stop()
+    } else {
+      lastTime = 0
+      start()
+    }
+  }
+
   resize()
-  animationId = requestAnimationFrame(draw)
+  start()
   window.addEventListener('resize', resize)
+  document.addEventListener('visibilitychange', onVisibility)
 
   onBeforeUnmount(() => {
-    cancelAnimationFrame(animationId)
+    stop()
     window.removeEventListener('resize', resize)
+    document.removeEventListener('visibilitychange', onVisibility)
   })
 })
 </script>
