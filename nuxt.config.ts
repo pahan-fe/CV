@@ -30,8 +30,8 @@ export default defineNuxtConfig({
       devOptions: { enabled: false, suppressWarnings: true },
       workbox: process.env.NODE_ENV === 'production' ? {
         navigateFallback: null,
-        skipWaiting: true,
-        clientsClaim: true,
+        skipWaiting: false,
+        clientsClaim: false,
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,ico,png,svg,webp,woff,woff2}'],
         additionalManifestEntries: [
