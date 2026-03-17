@@ -22,23 +22,9 @@ button { background: none; border: 0; color: inherit; cursor: pointer; }
 p, h1, h2, h3, h4, h5, h6 { overflow-wrap: anywhere; }
 
 #app, #__nuxt { isolation: isolate; }
+#__nuxt { opacity: 1 !important; transition: opacity 0.15s ease; }
 
 :root {
-  --bg: #fafafa;
-  --bg-soft: #f2f2f2;
-  --fg: #171717;
-  --fg-secondary: #525252;
-  --card: #ffffff;
-  --muted: #737373;
-  --border: #e5e5e5;
-  --accent: #404040;
-  --accent-soft: rgba(64, 64, 64, 0.06);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --glow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  color-scheme: light;
-}
-
-html[data-theme='dark'] {
   --bg: #0a0a0a;
   --bg-soft: #141414;
   --fg: #ededed;
@@ -51,6 +37,21 @@ html[data-theme='dark'] {
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   --glow: 0 0 0 1px rgba(255, 255, 255, 0.08);
   color-scheme: dark;
+}
+
+html[data-theme='light'] {
+  --bg: #fafafa;
+  --bg-soft: #f2f2f2;
+  --fg: #171717;
+  --fg-secondary: #525252;
+  --card: #ffffff;
+  --muted: #737373;
+  --border: #e5e5e5;
+  --accent: #404040;
+  --accent-soft: rgba(64, 64, 64, 0.06);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --glow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  color-scheme: light;
 }
 
 @keyframes reveal {

@@ -75,7 +75,7 @@ useSeoMeta({
 
 <template>
   <div id="app">
-    <StarField v-if="theme === 'dark'" />
+    <StarField :dark="theme === 'dark'" />
     <div class="grain" />
     <div v-if="!isOnline" class="offline-banner">You're offline. Viewing cached content.</div>
     <NuxtPage />
