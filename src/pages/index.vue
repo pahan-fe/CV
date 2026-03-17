@@ -740,21 +740,31 @@ onMounted(() => {
     overflow-x: auto;
     gap: 4px;
     order: -1;
-    padding-bottom: 4px;
     position: sticky;
     top: 0;
     z-index: 10;
     background: var(--bg);
-    padding: 12px 0;
+    padding: 10px 16px;
     margin: 0 -16px;
-    padding-left: 16px;
-    padding-right: 16px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+
+  .sidebar__nav::-webkit-scrollbar { display: none; }
+
+  .sidebar__indicator { display: none; }
 
   .sidebar__link {
     white-space: nowrap;
     padding: 6px 10px;
     font-size: 0.82rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .sidebar__link--active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
   }
 
   .sidebar__skills {
@@ -764,12 +774,14 @@ onMounted(() => {
 
   .hero__first, .hero__last { font-size: 3rem; }
 
+  .card__header { flex-direction: column; gap: 4px; }
+  .card__period { align-self: flex-start; }
+
   .timeline::before { left: 5px; }
   .timeline__entry { padding-left: 28px; }
 
   .article-link { flex-wrap: wrap; }
   .article-link__desc { white-space: normal; }
-  .contact-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 600px) {
@@ -779,6 +791,8 @@ onMounted(() => {
   .card { padding: 14px; }
   .tag { font-size: 0.75rem; padding: 3px 8px; }
   .contact-grid { grid-template-columns: 1fr; }
+  .contact-card { flex-direction: row; gap: 12px; padding: 14px 16px; }
+  .contact-card__label { font-size: 0.9rem; }
 }
 
 @media print {
