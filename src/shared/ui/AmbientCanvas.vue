@@ -53,6 +53,19 @@ const createTentacle = (): Tentacle => ({
   thick: 1 + Math.random() * 1.5,
 })
 
+interface Spore {
+  x: number; y: number
+  vx: number; vy: number
+  life: number; maxLife: number
+  size: number; curve: number
+}
+
+interface Link {
+  a: number; b: number
+  life: number; maxLife: number
+  ctrl: { x: number; y: number }
+}
+
 interface Blob {
   ox: number; oy: number
   r: number; phase: number; speed: number
@@ -92,9 +105,13 @@ onMounted(() => {
   let stars: Star[] = []
   let shootingStars: ShootingStar[] = []
   let symbiotes: Symbiote[] = []
+  let spores: Spore[] = []
+  let links: Link[] = []
   let width = 0
   let height = 0
   let shootingTimer = 0
+  let sporeTimer = 0
+  let linkTimer = 0
 
   const resize = () => {
     width = el.offsetWidth
@@ -216,6 +233,151 @@ onMounted(() => {
     }
   }
 
+  const spawnSpore = () => {
+    if (symbiotes.length === 0) return
+    const src = symbiotes[Math.floor(Math.random() * symbiotes.length)]!
+    const angle = Math.random() * Math.PI * 2
+    const speed = 1.5 + Math.random() * 3
+    spores.push({
+      x: src.x,
+      y: src.y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0,
+      maxLife: 1200 + Math.random() * 1800,
+      size: 2 + Math.random() * 3,
+      curve: (Math.random() - 0.5) * 0.03,
+    })
+  }
+
+  const drawSpores = (dt: number) => {
+    sporeTimer += dt
+    if (sporeTimer > 3000 + Math.random() * 5000) {
+      sporeTimer = 0
+      spawnSpore()
+    }
+
+    for (let i = spores.length - 1; i >= 0; i--) {
+      const s = spores[i]!
+      s.life += dt
+      const t = dt / 16
+      s.vx += s.curve * t
+      s.vy += s.curve * 0.5 * t
+      s.x += s.vx * t
+      s.y += s.vy * t
+
+      const progress = s.life / s.maxLife
+      const alpha = progress < 0.1
+        ? progress / 0.1
+        : progress > 0.6
+          ? 1 - (progress - 0.6) / 0.4
+          : 1
+
+      if (s.life >= s.maxLife || s.x < -50 || s.x > width + 50 || s.y < -50 || s.y > height + 50) {
+        spores.splice(i, 1)
+        continue
+      }
+
+      const speed = Math.sqrt(s.vx * s.vx + s.vy * s.vy)
+      const nx = -s.vx / speed
+      const ny = -s.vy / speed
+      const tailLen = 15 + speed * 8
+
+      const grad = ctx.createLinearGradient(s.x, s.y, s.x + nx * tailLen, s.y + ny * tailLen)
+      grad.addColorStop(0, `rgba(0,0,0,${alpha * 0.12})`)
+      grad.addColorStop(0.5, `rgba(0,0,0,${alpha * 0.05})`)
+      grad.addColorStop(1, 'rgba(0,0,0,0)')
+
+      ctx.beginPath()
+      ctx.moveTo(s.x, s.y)
+      ctx.lineTo(s.x + nx * tailLen, s.y + ny * tailLen)
+      ctx.strokeStyle = grad
+      ctx.lineWidth = 1
+      ctx.lineCap = 'round'
+      ctx.stroke()
+
+      const headGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size)
+      headGrad.addColorStop(0, `rgba(0,0,0,${alpha * 0.15})`)
+      headGrad.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.beginPath()
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2)
+      ctx.fillStyle = headGrad
+      ctx.fill()
+    }
+  }
+
+  const spawnLink = () => {
+    if (symbiotes.length < 2) return
+    let bestA = 0, bestB = 1, bestDist = Infinity
+    for (let i = 0; i < symbiotes.length; i++) {
+      for (let j = i + 1; j < symbiotes.length; j++) {
+        const dx = symbiotes[i]!.x - symbiotes[j]!.x
+        const dy = symbiotes[i]!.y - symbiotes[j]!.y
+        const d = dx * dx + dy * dy
+        if (d < bestDist && d > 2500) {
+          bestDist = d
+          bestA = i
+          bestB = j
+        }
+      }
+    }
+    const a = symbiotes[bestA]!
+    const b = symbiotes[bestB]!
+    const mx = (a.x + b.x) / 2
+    const my = (a.y + b.y) / 2
+    const offset = 30 + Math.random() * 50
+    const angle = Math.atan2(b.y - a.y, b.x - a.x) + Math.PI / 2
+    links.push({
+      a: bestA,
+      b: bestB,
+      life: 0,
+      maxLife: 2000 + Math.random() * 2000,
+      ctrl: {
+        x: mx + Math.cos(angle) * offset * (Math.random() > 0.5 ? 1 : -1),
+        y: my + Math.sin(angle) * offset * (Math.random() > 0.5 ? 1 : -1),
+      },
+    })
+  }
+
+  const drawLinks = (dt: number) => {
+    linkTimer += dt
+    if (linkTimer > 5000 + Math.random() * 8000) {
+      linkTimer = 0
+      spawnLink()
+    }
+
+    for (let i = links.length - 1; i >= 0; i--) {
+      const l = links[i]!
+      l.life += dt
+      const progress = l.life / l.maxLife
+      const alpha = progress < 0.2
+        ? progress / 0.2
+        : progress > 0.7
+          ? 1 - (progress - 0.7) / 0.3
+          : 1
+
+      if (l.life >= l.maxLife) {
+        links.splice(i, 1)
+        continue
+      }
+
+      const a = symbiotes[l.a]
+      const b = symbiotes[l.b]
+      if (!a || !b) {
+        links.splice(i, 1)
+        continue
+      }
+
+      ctx.beginPath()
+      ctx.moveTo(a.x, a.y)
+      ctx.quadraticCurveTo(l.ctrl.x, l.ctrl.y, b.x, b.y)
+      ctx.strokeStyle = `rgba(0,0,0,${alpha * 0.06})`
+      ctx.lineWidth = 0.8
+      ctx.lineCap = 'round'
+      ctx.stroke()
+    }
+  }
+
   const drawSymbiotes = (time: number, dt: number) => {
     for (const s of symbiotes) {
       const breathe = 1 + Math.sin(time * s.pulseSpeed + s.pulse) * 0.15
@@ -315,7 +477,9 @@ onMounted(() => {
       drawStars(time)
       drawShootingStars(dt)
     } else {
+      drawLinks(dt)
       drawSymbiotes(time, dt)
+      drawSpores(dt)
     }
 
     animationId = requestAnimationFrame(draw)
@@ -357,11 +521,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas ref="canvas" class="starfield" aria-hidden="true" />
+  <canvas ref="canvas" class="ambient-canvas" aria-hidden="true" />
 </template>
 
 <style scoped>
-.starfield {
+.ambient-canvas {
   position: fixed;
   inset: 0;
   width: 100%;

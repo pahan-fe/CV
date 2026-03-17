@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTheme } from './features/theme-toggle/model/useTheme'
 import { THEME_COLORS } from './shared/lib/theme'
-import StarField from './shared/ui/StarField.vue'
+import AmbientCanvas from './shared/ui/AmbientCanvas.vue'
 
 const url = useRequestURL()
 const siteName = 'Pavel Zagvozdin — CV'
@@ -83,7 +83,7 @@ useSeoMeta({
 
 <template>
   <div id="app">
-    <StarField :dark="theme === 'dark'" />
+    <AmbientCanvas :dark="theme === 'dark'" />
     <div class="grain" />
     <div v-if="!isOnline" class="offline-banner">You're offline. Viewing cached content.</div>
     <NuxtPage />
