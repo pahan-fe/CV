@@ -105,7 +105,7 @@ onMounted(() => {
       radius: Math.random() * 2.5 + 0.5,
       speed: Math.random() * 0.003 + 0.001,
       phase: Math.random() * Math.PI * 2,
-      color: DARK_COLORS[Math.floor(Math.random() * DARK_COLORS.length)],
+      color: DARK_COLORS[Math.floor(Math.random() * DARK_COLORS.length)]!,
     }))
   }
 

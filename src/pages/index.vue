@@ -25,7 +25,8 @@ useSchemaOrg([
 ])
 
 const sections = ['summary', 'experience', 'education', 'languages', 'articles', 'contact'] as const
-const activeSection = ref(sections[0])
+type Section = typeof sections[number]
+const activeSection = ref<Section>(sections[0])
 
 const navRef = ref<HTMLElement>()
 const indicatorStyle = ref({ top: '0px', height: '0px', opacity: '0' })
@@ -71,12 +72,12 @@ onMounted(() => {
     const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 50
 
     if (atBottom) {
-      activeSection.value = sections[sections.length - 1]
+      activeSection.value = sections[sections.length - 1] as Section
       return
     }
 
     const threshold = window.innerHeight * 0.3
-    let current = sections[0]
+    let current: Section = sections[0]
 
     for (const id of sections) {
       const el = document.getElementById(id)
