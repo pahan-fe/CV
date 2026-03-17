@@ -1,8 +1,6 @@
 <script setup lang="ts">
-// Explicit imports for TS type checking (Nuxt auto-imports at runtime)
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRuntimeConfig, useRequestURL, useRoute, useHead, useSeoMeta } from 'nuxt/app'
 import { useTheme } from './features/theme-toggle/model/useTheme'
+import { THEME_COLORS } from './shared/lib/theme'
 
 // Compute the current absolute URL for canonical and OG url
 const url = useRequestURL()
@@ -13,7 +11,7 @@ const canonical = computed(() => `${config.public.siteUrl}${route.path}`)
 const ogImage = computed(() => `${config.public.siteUrl}/og.png`)
 // Theme color for browser UI that matches current theme
 const { theme } = useTheme()
-const metaThemeColor = computed(() => (theme.value === 'dark' ? '#0e0e0e' : '#ffffff'))
+const metaThemeColor = computed(() => THEME_COLORS[theme.value])
 
 // Use a custom laptop favicon in production to avoid Nuxt default icon
 const faviconLinks = import.meta.dev
@@ -64,12 +62,12 @@ useHead({
 useSeoMeta({
   // Basic
   title: siteName,
-  description: 'Frontend developer CV.',
+  description: 'Senior Frontend Engineer CV.',
   robots: 'index, follow',
 
   // Open Graph
   ogTitle: siteName,
-  ogDescription: 'Frontend developer CV.',
+  ogDescription: 'Senior Frontend Engineer CV.',
   ogType: 'website',
   ogUrl: url.href,
   ogSiteName: siteName,
@@ -79,7 +77,7 @@ useSeoMeta({
   // Twitter
   twitterCard: 'summary_large_image',
   twitterTitle: siteName,
-  twitterDescription: 'Frontend developer CV.',
+  twitterDescription: 'Senior Frontend Engineer CV.',
   twitterImage: ogImage.value,
 
   // Browser UI

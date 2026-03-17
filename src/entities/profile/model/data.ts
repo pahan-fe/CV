@@ -2,8 +2,9 @@ import type { Profile } from './types'
 
 export const profile: Profile = {
   name: 'Pavel Zagvozdin',
-  role: 'Frontend Developer',
+  role: 'Senior Frontend Engineer',
   email: 'mailto:zagvzdin.pakhan.webdev@gmail.com',
   linkedin: 'https://linkedin.com/in/pahanz',
-  summary: 'Frontend developer with 8 years in React, Vue, and TypeScript; experienced in large-scale web apps, microfrontends, performance optimization, internal tools, CI/CD, and cross-functional collaboration. Focused on code quality, maintainability, and long-term product stability.',
+  website: 'https://www.pahanz.dev/',
+  summary: 'Senior Frontend Engineer with 8+ years of experience building web platforms for global markets as part of cross-functional teams. Contributed to products processing 53k+ daily orders, helped cut deployment times by 92%, and collaborated on automation saving hundreds of developer hours annually. Expert in JavaScript and TypeScript.',
 }

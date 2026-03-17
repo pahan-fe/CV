@@ -71,7 +71,10 @@ useSchemaOrg([
         <div class="timeline">
           <article v-for="(item, i) in experience" :key="i" class="card">
             <header class="card__header">
-              <h3 class="card__title">{{ item.role }} · {{ item.company }}</h3>
+              <div>
+                <h3 class="card__title">{{ item.role }} · {{ item.company }}</h3>
+                <span v-if="item.location" class="card__location">{{ item.location }}</span>
+              </div>
               <span class="card__period">{{ item.period }}</span>
             </header>
             <template v-if="item.details && item.details.length">
@@ -124,6 +127,7 @@ useSchemaOrg([
         <ul class="list">
           <li v-for="article in articles" :key="article.url">
             <a :href="article.url" target="_blank" rel="noopener">{{ article.title }}</a>
+            <span v-if="article.description" class="article__desc"> — {{ article.description }}</span>
           </li>
         </ul>
       </section>
@@ -133,6 +137,7 @@ useSchemaOrg([
         <ul class="list">
           <li><a :href="profile.email">Email</a></li>
           <li><a :href="profile.linkedin" target="_blank" rel="noopener">LinkedIn</a></li>
+          <li><a :href="profile.website" target="_blank" rel="noopener">Website</a></li>
         </ul>
       </section>
     </section>
@@ -220,10 +225,12 @@ useSchemaOrg([
 }
 .card__header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .card__title { margin: 0; font-size: 1rem; }
-.card__period { opacity: 0.7; font-size: 0.9rem; }
+.card__period { opacity: 0.7; font-size: 0.9rem; white-space: nowrap; }
+.card__location { opacity: 0.6; font-size: 0.85rem; }
 .card__list { margin: 8px 0 0 18px; }
 .card__desc { opacity: 0.9; margin: 8px 0; }
 .summary { opacity: 0.9; margin: 0; line-height: 1.6; }
+.article__desc { opacity: 0.7; font-size: 0.9rem; }
 .subprojects { display: grid; gap: 12px; margin-top: 8px; }
 .sub { border-top: 1px dashed var(--border); padding-top: 10px; }
 .sub__head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }

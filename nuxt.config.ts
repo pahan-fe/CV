@@ -90,7 +90,7 @@ export default defineNuxtConfig({
       manifest: {
         name: 'Pavel Zagvozdin — CV',
         short_name: 'Pavel CV',
-        description: 'Frontend developer CV',
+        description: 'Senior Frontend Engineer CV',
         theme_color: '#020420',
         background_color: '#020420',
         display: 'standalone',
@@ -118,14 +118,14 @@ export default defineNuxtConfig({
   },
   // @nuxtjs/sitemap configuration
   sitemap: {
-  includeAppSources: true,
-  cacheMaxAgeSeconds: 60 * 10, // 10 minutes
-  exclude: ['/offline.html']
+    includeAppSources: true,
+    cacheMaxAgeSeconds: 60 * 10, // 10 minutes
+    exclude: ['/offline.html'],
   },
   // @nuxtjs/robots configuration
   robots: {
-  allow: ['/'],
-  disallow: ['/offline.html'],
-  sitemap: ['/sitemap.xml']
+    allow: ['/'],
+    disallow: ['/offline.html'],
+    sitemap: ['/sitemap.xml'],
   }
 })

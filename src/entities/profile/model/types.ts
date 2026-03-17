@@ -3,5 +3,6 @@ export type Profile = {
   role: string
   email: string
   linkedin: string
+  website: string
   summary?: string
 }
