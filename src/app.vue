@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTheme } from './features/theme-toggle/model/useTheme'
 import { THEME_COLORS } from './shared/lib/theme'
+import StarField from './shared/ui/StarField.vue'
 
 const url = useRequestURL()
 const siteName = 'Pavel Zagvozdin — CV'
@@ -74,6 +75,7 @@ useSeoMeta({
 
 <template>
   <div id="app">
+    <StarField v-if="theme === 'dark'" />
     <div v-if="!isOnline" class="offline-banner">You're offline. Viewing cached content.</div>
     <NuxtPage />
   </div>
@@ -84,6 +86,7 @@ useSeoMeta({
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
+  position: relative;
   font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
