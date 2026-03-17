@@ -103,10 +103,10 @@ onMounted(() => {
   }
 
   let stars: Star[] = []
-  let shootingStars: ShootingStar[] = []
+  const shootingStars: ShootingStar[] = []
   let symbiotes: Symbiote[] = []
-  let spores: Spore[] = []
-  let links: Link[] = []
+  const spores: Spore[] = []
+  const links: Link[] = []
   let width = 0
   let height = 0
   let shootingTimer = 0
