@@ -27,6 +27,24 @@ useSchemaOrg([
 const sections = ['summary', 'experience', 'education', 'languages', 'articles', 'contact'] as const
 const activeSection = ref(sections[0])
 
+const navRef = ref<HTMLElement>()
+const indicatorStyle = ref({ top: '0px', height: '0px', opacity: '0' })
+
+function updateIndicator() {
+  if (!navRef.value) return
+  const link = navRef.value.querySelector(`[data-section="${activeSection.value}"]`) as HTMLElement | null
+  if (!link) return
+  const navRect = navRef.value.getBoundingClientRect()
+  const linkRect = link.getBoundingClientRect()
+  indicatorStyle.value = {
+    top: `${linkRect.top - navRect.top}px`,
+    height: `${linkRect.height}px`,
+    opacity: '1',
+  }
+}
+
+watch(activeSection, () => nextTick(updateIndicator))
+
 const typedRole = ref('')
 const showCursor = ref(true)
 
@@ -43,23 +61,33 @@ onMounted(() => {
 })
 
 onMounted(() => {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          activeSection.value = entry.target.id as typeof sections[number]
-        }
-      }
-    },
-    { rootMargin: '-20% 0px -60% 0px' },
-  )
+  function onScroll() {
+    const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 50
 
-  for (const id of sections) {
-    const el = document.getElementById(id)
-    if (el) observer.observe(el)
+    if (atBottom) {
+      activeSection.value = sections[sections.length - 1]
+      return
+    }
+
+    const threshold = window.innerHeight * 0.3
+    let current = sections[0]
+
+    for (const id of sections) {
+      const el = document.getElementById(id)
+      if (el && el.getBoundingClientRect().top <= threshold) {
+        current = id
+      }
+    }
+
+    activeSection.value = current
   }
 
-  onBeforeUnmount(() => observer.disconnect())
+  window.addEventListener('scroll', onScroll, { passive: true })
+  onScroll()
+
+  onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+
+  nextTick(updateIndicator)
 })
 </script>
 
@@ -79,13 +107,15 @@ onMounted(() => {
     </header>
 
     <aside class="sidebar">
-      <nav class="sidebar__nav reveal" style="animation-delay: 0.1s">
+      <nav ref="navRef" class="sidebar__nav reveal" style="animation-delay: 0.1s">
+        <div class="sidebar__indicator" :style="indicatorStyle" />
         <a
           v-for="s in sections"
           :key="s"
           :href="`#${s}`"
           class="sidebar__link"
           :class="{ 'sidebar__link--active': activeSection === s }"
+          :data-section="s"
         >
           {{ s }}
         </a>
@@ -269,6 +299,16 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  position: relative;
+}
+
+.sidebar__indicator {
+  position: absolute;
+  left: 0;
+  width: 2px;
+  background: var(--fg);
+  border-radius: 1px;
+  transition: top 300ms cubic-bezier(0.4, 0, 0.2, 1), height 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms;
 }
 
 .sidebar__link {
@@ -278,19 +318,15 @@ onMounted(() => {
   text-decoration: none;
   font-size: 0.88rem;
   text-transform: capitalize;
-  border-radius: 6px;
-  transition: color 200ms, background-color 200ms;
+  transition: color 200ms;
 }
 
 .sidebar__link:hover {
   color: var(--fg);
-  background: var(--accent-soft);
 }
 
 .sidebar__link--active {
   color: var(--fg);
-  background: var(--accent-soft);
-  font-weight: 600;
 }
 
 .sidebar__skills {
