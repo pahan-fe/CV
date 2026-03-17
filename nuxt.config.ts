@@ -11,15 +11,12 @@ export default defineNuxtConfig({
   ],
   app: {
     head: {
-      htmlAttrs: { lang: 'en', 'data-theme': 'dark' },
+      htmlAttrs: { lang: 'en' },
       meta: [
-        { name: 'theme-color', content: '#0a0a0a' }
-      ],
-      style: [
-        { children: 'html,body,#__nuxt{background:#0a0a0a;color:#ededed}html[data-theme="light"],html[data-theme="light"] body,html[data-theme="light"] #__nuxt{background:#fafafa;color:#171717}#__nuxt{opacity:0}' }
+        { name: 'theme-color', content: '#0a0a0a' },
       ],
       script: [
-        { children: '(function(){try{var s=null;try{s=localStorage.getItem("theme")}catch(e){}var d=window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;var t=(s==="light"||s==="dark")?s:(d?"dark":"light");document.documentElement.dataset.theme=t;var m=document.querySelector("meta[name=theme-color]");if(m)m.setAttribute("content",t==="dark"?"#0a0a0a":"#fafafa")}catch(e){}})()' }
+        { children: '(function(){try{var s=localStorage.getItem("theme")}catch(e){}var d=window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;var t=(s==="light"||s==="dark")?s:(d?"dark":"light");document.documentElement.dataset.theme=t}catch(e){}})()' }
       ],
     }
   },
