@@ -2,6 +2,20 @@
 const canvas = ref<HTMLCanvasElement>()
 let animationId: number
 
+const STAR_COLORS = [
+  [255, 255, 255],
+  [255, 255, 255],
+  [255, 255, 255],
+  [255, 255, 255],
+  [255, 255, 255],
+  [255, 240, 220],
+  [255, 230, 200],
+  [255, 210, 170],
+  [200, 220, 255],
+  [180, 200, 255],
+  [255, 180, 150],
+]
+
 interface Star {
   x: number
   y: number
@@ -9,6 +23,7 @@ interface Star {
   opacity: number
   speed: number
   phase: number
+  color: number[]
 }
 
 onMounted(() => {
@@ -40,6 +55,7 @@ onMounted(() => {
       opacity: Math.random(),
       speed: Math.random() * 0.003 + 0.001,
       phase: Math.random() * Math.PI * 2,
+      color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
     }))
   }
 
@@ -51,10 +67,11 @@ onMounted(() => {
       const alpha = 0.3 + flicker * 0.7
       const r = star.radius
 
+      const [cr, cg, cb] = star.color
       const gradient = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, r)
-      gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha})`)
-      gradient.addColorStop(0.4, `rgba(255, 255, 255, ${alpha * 0.5})`)
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+      gradient.addColorStop(0, `rgba(${cr}, ${cg}, ${cb}, ${alpha})`)
+      gradient.addColorStop(0.4, `rgba(${cr}, ${cg}, ${cb}, ${alpha * 0.5})`)
+      gradient.addColorStop(1, `rgba(${cr}, ${cg}, ${cb}, 0)`)
 
       ctx.beginPath()
       ctx.arc(star.x, star.y, r, 0, Math.PI * 2)
