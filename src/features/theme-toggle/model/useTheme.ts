@@ -3,7 +3,6 @@ import { THEME_COLORS, THEME_STORAGE_KEY } from '~/shared/lib/theme'
 
 export type Theme = 'light' | 'dark'
 
-// Singleton state shared across composable callers
 const theme = ref<Theme>('dark')
 let initialized = false
 
@@ -24,7 +23,7 @@ function init() {
     if (s === 'light' || s === 'dark') {
       theme.value = s
     }
-  } catch { /* ignore */ }
+  } catch {}
   apply(theme.value)
 }
 
@@ -35,9 +34,7 @@ export function useTheme() {
     theme.value = theme.value === 'dark' ? 'light' : 'dark'
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme.value)
-    } catch {
-      // ignore write errors (Safari private mode, etc.)
-    }
+    } catch {}
     apply(theme.value)
   }
 
