@@ -3,9 +3,9 @@ import ThemeToggle from '~/features/theme-toggle/ui/ThemeToggle.vue'
 import { profile } from '~/entities/profile'
 import { experience } from '~/entities/experience'
 import { education } from '~/entities/education'
-import { skills } from '~/entities/skills'
 import { languages } from '~/entities/languages'
 import { articles } from '~/entities/articles'
+import { skillCategories } from '~/entities/skills'
 
 const url = useRequestURL()
 useSeoMeta({
@@ -27,28 +27,6 @@ useSchemaOrg([
 const sections = ['summary', 'experience', 'education', 'languages', 'articles', 'contact'] as const
 type Section = typeof sections[number]
 const activeSection = ref<Section>(sections[0])
-
-const navRef = ref<HTMLElement>()
-const indicatorStyle = ref({ top: '0px', height: '0px', opacity: '0' })
-
-const updateIndicator = () => {
-  if (!navRef.value) {
-    return
-  }
-  const link = navRef.value.querySelector(`[data-section="${activeSection.value}"]`) as HTMLElement | null
-  if (!link) {
-    return
-  }
-  const navRect = navRef.value.getBoundingClientRect()
-  const linkRect = link.getBoundingClientRect()
-  indicatorStyle.value = {
-    top: `${linkRect.top - navRect.top}px`,
-    height: `${linkRect.height}px`,
-    opacity: '1',
-  }
-}
-
-watch(activeSection, () => nextTick(updateIndicator))
 
 const typedRole = ref('')
 const showCursor = ref(true)
@@ -95,8 +73,6 @@ onMounted(() => {
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', onScroll)
   })
-
-  nextTick(updateIndicator)
 })
 </script>
 
@@ -116,26 +92,7 @@ onMounted(() => {
     </header>
 
     <aside class="sidebar">
-      <nav ref="navRef" class="sidebar__nav reveal" style="animation-delay: 0.1s">
-        <div class="sidebar__indicator" :style="indicatorStyle" />
-        <a
-          v-for="s in sections"
-          :key="s"
-          :href="`#${s}`"
-          class="sidebar__link"
-          :class="{ 'sidebar__link--active': activeSection === s }"
-          :data-section="s"
-        >
-          {{ s }}
-        </a>
-      </nav>
-
-      <section class="sidebar__skills reveal" style="animation-delay: 0.2s">
-        <h2 class="section-title">Skills</h2>
-        <ul class="tags">
-          <li v-for="s in skills" :key="s" class="tag">{{ s }}</li>
-        </ul>
-      </section>
+      <SidebarNav :active-section="activeSection" />
     </aside>
 
     <section class="content">
@@ -204,6 +161,16 @@ onMounted(() => {
         <ul class="tags">
           <li v-for="l in languages" :key="l" class="tag">{{ l }}</li>
         </ul>
+      </section>
+
+      <section id="skills" class="block reveal mobile-only" style="animation-delay: 0.32s">
+        <h2 class="section-title">Skills</h2>
+        <div v-for="cat in skillCategories" :key="cat.label" class="skill-group">
+          <h3 class="skill-group__label">{{ cat.label }}</h3>
+          <ul class="tags">
+            <li v-for="s in cat.skills" :key="s" class="tag">{{ s }}</li>
+          </ul>
+        </div>
       </section>
 
       <section id="articles" class="block reveal" style="animation-delay: 0.35s">
@@ -321,45 +288,6 @@ onMounted(() => {
   flex-direction: column;
   gap: 32px;
   min-width: 0;
-}
-
-.sidebar__nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  position: relative;
-}
-
-.sidebar__indicator {
-  position: absolute;
-  left: 0;
-  width: 2px;
-  background: var(--fg);
-  border-radius: 1px;
-  transition: top 300ms cubic-bezier(0.4, 0, 0.2, 1), height 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms;
-}
-
-.sidebar__link {
-  display: block;
-  padding: 6px 12px;
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 0.88rem;
-  text-transform: capitalize;
-  transition: color 200ms;
-}
-
-.sidebar__link:hover {
-  color: var(--fg);
-}
-
-.sidebar__link--active {
-  color: var(--fg);
-}
-
-.sidebar__skills {
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
 }
 
 .content {
@@ -722,55 +650,47 @@ onMounted(() => {
   word-break: break-all;
 }
 
+.mobile-only {
+  display: none;
+}
+
+.skill-group {
+  margin-bottom: 16px;
+}
+
+.skill-group:last-child {
+  margin-bottom: 0;
+}
+
+.skill-group__label {
+  font-family: 'Darker Grotesque', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
 @media (max-width: 900px) {
+  .mobile-only {
+    display: block;
+  }
+
   .cv {
     grid-template-columns: 1fr;
-    grid-template-areas: 'hero' 'content';
+    grid-template-areas: 'hero' 'sidebar' 'content';
     gap: 24px;
     padding: 32px 16px 64px;
   }
 
   .sidebar {
-    position: static;
-    grid-area: content;
-    display: contents;
-  }
-
-  .sidebar__nav {
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 4px;
-    order: -1;
     position: sticky;
     top: 0;
     z-index: 10;
     background: var(--bg);
-    padding: 10px 16px;
+    padding: 0;
     margin: 0 -16px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .sidebar__nav::-webkit-scrollbar { display: none; }
-
-  .sidebar__indicator { display: none; }
-
-  .sidebar__link {
-    white-space: nowrap;
-    padding: 6px 10px;
-    font-size: 0.82rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-  }
-
-  .sidebar__link--active {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-  }
-
-  .sidebar__skills {
-    border-top: none;
-    padding-top: 0;
   }
 
   .hero__first, .hero__last { font-size: 3rem; }
@@ -781,14 +701,15 @@ onMounted(() => {
   .timeline::before { left: 5px; }
   .timeline__entry { padding-left: 28px; }
 
-  .article-link { flex-wrap: wrap; }
+  .article-link { flex-direction: column; align-items: flex-start; gap: 6px; }
   .article-link__desc { white-space: normal; }
+  .article-link__arrow { align-self: flex-end; }
 }
 
 @media (max-width: 600px) {
   .cv { padding: 24px 12px 48px; }
   .hero__first, .hero__last { font-size: 2.2rem; }
-  .hero { flex-direction: column; align-items: flex-start; }
+  .hero { flex-wrap: wrap; }
   .card { padding: 14px; }
   .tag { font-size: 0.75rem; padding: 3px 8px; }
   .contact-grid { grid-template-columns: 1fr; }

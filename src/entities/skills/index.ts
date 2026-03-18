@@ -1,2 +1,2 @@
 export * from './model/types'
-export { skills } from './model/data'
+export { skills, skillCategories } from './model/data'
