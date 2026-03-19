@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     'nuxt-schema-org',
     ['@vite-pwa/nuxt', {
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       devOptions: { enabled: false, suppressWarnings: true },
       workbox: process.env.NODE_ENV === 'production' ? {
         navigateFallback: null,
