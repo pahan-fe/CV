@@ -40,18 +40,36 @@ interface Symbiote {
   tentacles: Tentacle[]
 }
 
-const createTentacle = (): Tentacle => ({
-  angle: Math.random() * Math.PI * 2,
-  maxLen: 30 + Math.random() * 60,
-  len: 0,
-  phase: 'wait',
-  timer: 0,
-  wait: 1000 + Math.random() * 5000,
-  speed: 0.2 + Math.random() * 0.3,
-  wave: 5 + Math.random() * 10,
-  freq: 0.04 + Math.random() * 0.04,
-  thick: 1 + Math.random() * 1.5,
-})
+const createTentacle = (startVisible = false): Tentacle => {
+  const maxLen = 30 + Math.random() * 60
+  if (startVisible) {
+    const len = maxLen * (0.5 + Math.random() * 0.5)
+    return {
+      angle: Math.random() * Math.PI * 2,
+      maxLen,
+      len,
+      phase: 'hold',
+      timer: Math.random() * 400,
+      wait: 1000 + Math.random() * 5000,
+      speed: 0.2 + Math.random() * 0.3,
+      wave: 5 + Math.random() * 10,
+      freq: 0.04 + Math.random() * 0.04,
+      thick: 1 + Math.random() * 1.5,
+    }
+  }
+  return {
+    angle: Math.random() * Math.PI * 2,
+    maxLen,
+    len: 0,
+    phase: 'wait',
+    timer: 0,
+    wait: 1000 + Math.random() * 5000,
+    speed: 0.2 + Math.random() * 0.3,
+    wave: 5 + Math.random() * 10,
+    freq: 0.04 + Math.random() * 0.04,
+    thick: 1 + Math.random() * 1.5,
+  }
+}
 
 interface Spore {
   x: number; y: number
@@ -88,7 +106,7 @@ const createSymbiote = (w: number, h: number): Symbiote => {
       phase: Math.random() * Math.PI * 2,
       speed: 0.0005 + Math.random() * 0.001,
     })),
-    tentacles: Array.from({ length: 3 + Math.floor(Math.random() * 3) }, createTentacle),
+    tentacles: Array.from({ length: 3 + Math.floor(Math.random() * 3) }, (_, i) => createTentacle(i < 2)),
   }
 }
 
