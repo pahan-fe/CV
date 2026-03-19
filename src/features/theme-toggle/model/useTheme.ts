@@ -39,7 +39,15 @@ export function useTheme() {
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme.value)
     } catch { /* ignored */ }
-    apply(theme.value)
+
+    const update = () => apply(theme.value)
+
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      const start = document.startViewTransition as (cb: () => void) => void
+      start.call(document, update)
+    } else {
+      update()
+    }
   }
 
   return { theme, toggleTheme }

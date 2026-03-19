@@ -85,6 +85,12 @@ html[data-theme='light'] {
   color-scheme: light;
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 350ms;
+  animation-timing-function: ease-in-out;
+}
+
 @keyframes reveal {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
