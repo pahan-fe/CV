@@ -10,6 +10,22 @@ const DARK_COLORS = [
   [200, 220, 255], [180, 200, 255], [255, 180, 150],
 ]
 
+const NEBULA_COLORS: number[][] = [
+  [80, 60, 200],
+  [160, 50, 140],
+  [60, 140, 180],
+  [180, 50, 50],
+  [100, 80, 200],
+  [40, 100, 160],
+]
+
+const GALAXY_COLORS: number[][] = [
+  [200, 180, 255],
+  [255, 220, 160],
+  [180, 210, 255],
+  [255, 190, 200],
+]
+
 interface Star {
   x: number; y: number; radius: number
   speed: number; phase: number; color: number[]
@@ -89,6 +105,29 @@ interface Blob {
   r: number; phase: number; speed: number
 }
 
+interface NebulaCloud {
+  ox: number; oy: number; r: number
+  color: number[]; opacity: number
+}
+
+interface Nebula {
+  x: number; y: number
+  clouds: NebulaCloud[]
+}
+
+type GalaxyType = 'spiral' | 'elliptical' | 'edge-on'
+
+interface Galaxy {
+  x: number; y: number
+  type: GalaxyType
+  radius: number
+  rotation: number
+  rotationSpeed: number
+  tilt: number
+  color: number[]
+  arms: number
+}
+
 const createSymbiote = (w: number, h: number): Symbiote => {
   const blobCount = 3 + Math.floor(Math.random() * 3)
   const baseR = 10 + Math.random() * 16
@@ -123,6 +162,8 @@ onMounted(() => {
   let stars: Star[] = []
   const shootingStars: ShootingStar[] = []
   let symbiotes: Symbiote[] = []
+  let nebulae: Nebula[] = []
+  let galaxies: Galaxy[] = []
   const spores: Spore[] = []
   const links: Link[] = []
   let width = 0
@@ -139,6 +180,8 @@ onMounted(() => {
     ctx.scale(devicePixelRatio, devicePixelRatio)
     initStars()
     initSymbiotes()
+    initNebulae()
+    initGalaxies()
   }
 
   const initStars = () => {
@@ -156,6 +199,240 @@ onMounted(() => {
   const initSymbiotes = () => {
     const count = Math.max(4, Math.floor((width * height) / 150000))
     symbiotes = Array.from({ length: count }, () => createSymbiote(width, height))
+  }
+
+  const initNebulae = () => {
+    const count = 4 + Math.floor(Math.random() * 3)
+    nebulae = Array.from({ length: count }, () => {
+      const cloudCount = 3 + Math.floor(Math.random() * 3)
+      const baseColor = NEBULA_COLORS[Math.floor(Math.random() * NEBULA_COLORS.length)]!
+      const baseR = 100 + Math.random() * 200
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height,
+        clouds: Array.from({ length: cloudCount }, () => ({
+          ox: (Math.random() - 0.5) * baseR * 0.6,
+          oy: (Math.random() - 0.5) * baseR * 0.6,
+          r: baseR * (0.4 + Math.random() * 0.6),
+          color: baseColor,
+          opacity: 0.012 + Math.random() * 0.02,
+        })),
+      }
+    })
+  }
+
+  const initGalaxies = () => {
+    const types: GalaxyType[] = ['spiral', 'elliptical', 'edge-on']
+    const count = 2 + Math.floor(Math.random() * 3)
+    galaxies = Array.from({ length: count }, () => {
+      const type = types[Math.floor(Math.random() * types.length)]!
+      const color = GALAXY_COLORS[Math.floor(Math.random() * GALAXY_COLORS.length)]!
+      let radius: number
+      let tilt: number
+      switch (type) {
+        case 'spiral':
+          radius = 40 + Math.random() * 40
+          tilt = 0.4 + Math.random() * 0.4
+          break
+        case 'elliptical':
+          radius = 25 + Math.random() * 30
+          tilt = 0.5 + Math.random() * 0.4
+          break
+        case 'edge-on':
+          radius = 50 + Math.random() * 40
+          tilt = 0.12 + Math.random() * 0.08
+          break
+      }
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height,
+        type,
+        radius,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (0.00003 + Math.random() * 0.00007) * (Math.random() > 0.5 ? 1 : -1),
+        tilt,
+        color,
+        arms: type === 'spiral' ? 2 + Math.floor(Math.random() * 2) : 0,
+      }
+    })
+  }
+
+  const drawNebulae = () => {
+    for (const n of nebulae) {
+      for (const c of n.clouds) {
+        const cx = n.x + c.ox
+        const cy = n.y + c.oy
+        const [cr, cg, cb] = c.color
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, c.r)
+        g.addColorStop(0, `rgba(${cr},${cg},${cb},${c.opacity})`)
+        g.addColorStop(0.5, `rgba(${cr},${cg},${cb},${c.opacity * 0.5})`)
+        g.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+        ctx.beginPath()
+        ctx.arc(cx, cy, c.r, 0, Math.PI * 2)
+        ctx.fillStyle = g
+        ctx.fill()
+      }
+    }
+  }
+
+  const drawSpiralGalaxy = (gal: Galaxy, cr: number, cg: number, cb: number) => {
+    const outerG = ctx.createRadialGradient(0, 0, 0, 0, 0, gal.radius)
+    outerG.addColorStop(0, `rgba(${cr},${cg},${cb},0.08)`)
+    outerG.addColorStop(0.5, `rgba(${cr},${cg},${cb},0.03)`)
+    outerG.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+    ctx.beginPath()
+    ctx.arc(0, 0, gal.radius, 0, Math.PI * 2)
+    ctx.fillStyle = outerG
+    ctx.fill()
+
+    for (let arm = 0; arm < gal.arms; arm++) {
+      const baseAngle = (Math.PI * 2 / gal.arms) * arm
+      const steps = 50
+
+      ctx.beginPath()
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps
+        const theta = baseAngle + t * Math.PI * 2.5
+        const r = gal.radius * 0.15 + t * gal.radius * 0.85
+        const x = r * Math.cos(theta)
+        const y = r * Math.sin(theta)
+        if (i === 0) { ctx.moveTo(x, y) } else { ctx.lineTo(x, y) }
+      }
+      ctx.strokeStyle = `rgba(${cr},${cg},${cb},0.06)`
+      ctx.lineWidth = 6
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+      ctx.stroke()
+
+      ctx.beginPath()
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps
+        const theta = baseAngle + t * Math.PI * 2.5
+        const r = gal.radius * 0.15 + t * gal.radius * 0.85
+        const x = r * Math.cos(theta)
+        const y = r * Math.sin(theta)
+        if (i === 0) { ctx.moveTo(x, y) } else { ctx.lineTo(x, y) }
+      }
+      ctx.strokeStyle = `rgba(${cr},${cg},${cb},0.15)`
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+
+      for (let i = 0; i < 8; i++) {
+        const t = (i + 0.5) / 8
+        const theta = baseAngle + t * Math.PI * 2.5
+        const r = gal.radius * 0.15 + t * gal.radius * 0.85
+        const sx = Math.sin(i * 127.1 + arm * 311.7) * 3
+        const sy = Math.cos(i * 83.3 + arm * 197.1) * 3
+        const x = r * Math.cos(theta) + sx
+        const y = r * Math.sin(theta) + sy
+        const dotR = 1 + (1 - t) * 1.5
+        const alpha = 0.25 * (1 - t * 0.6)
+        const dotG = ctx.createRadialGradient(x, y, 0, x, y, dotR)
+        dotG.addColorStop(0, `rgba(255,255,255,${alpha})`)
+        dotG.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+        ctx.beginPath()
+        ctx.arc(x, y, dotR, 0, Math.PI * 2)
+        ctx.fillStyle = dotG
+        ctx.fill()
+      }
+    }
+
+    const coreR = gal.radius * 0.15
+    const coreG = ctx.createRadialGradient(0, 0, 0, 0, 0, coreR)
+    coreG.addColorStop(0, 'rgba(255,255,255,0.5)')
+    coreG.addColorStop(0.5, `rgba(${cr},${cg},${cb},0.2)`)
+    coreG.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+    ctx.beginPath()
+    ctx.arc(0, 0, coreR, 0, Math.PI * 2)
+    ctx.fillStyle = coreG
+    ctx.fill()
+  }
+
+  const drawEllipticalGalaxy = (gal: Galaxy, cr: number, cg: number, cb: number) => {
+    const outerG = ctx.createRadialGradient(0, 0, 0, 0, 0, gal.radius)
+    outerG.addColorStop(0, `rgba(${cr},${cg},${cb},0.12)`)
+    outerG.addColorStop(0.3, `rgba(${cr},${cg},${cb},0.06)`)
+    outerG.addColorStop(0.7, `rgba(${cr},${cg},${cb},0.02)`)
+    outerG.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+    ctx.beginPath()
+    ctx.arc(0, 0, gal.radius, 0, Math.PI * 2)
+    ctx.fillStyle = outerG
+    ctx.fill()
+
+    const coreR = gal.radius * 0.3
+    const coreG = ctx.createRadialGradient(0, 0, 0, 0, 0, coreR)
+    coreG.addColorStop(0, 'rgba(255,255,255,0.4)')
+    coreG.addColorStop(0.5, `rgba(${cr},${cg},${cb},0.15)`)
+    coreG.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+    ctx.beginPath()
+    ctx.arc(0, 0, coreR, 0, Math.PI * 2)
+    ctx.fillStyle = coreG
+    ctx.fill()
+  }
+
+  const drawEdgeOnGalaxy = (gal: Galaxy, cr: number, cg: number, cb: number) => {
+    const diskR = gal.radius
+    const diskG = ctx.createRadialGradient(0, 0, 0, 0, 0, diskR)
+    diskG.addColorStop(0, `rgba(${cr},${cg},${cb},0.15)`)
+    diskG.addColorStop(0.4, `rgba(${cr},${cg},${cb},0.06)`)
+    diskG.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+    ctx.beginPath()
+    ctx.arc(0, 0, diskR, 0, Math.PI * 2)
+    ctx.fillStyle = diskG
+    ctx.fill()
+
+    ctx.save()
+    ctx.scale(1, 3)
+    const bulgeR = gal.radius * 0.2
+    const bulgeG = ctx.createRadialGradient(0, 0, 0, 0, 0, bulgeR)
+    bulgeG.addColorStop(0, 'rgba(255,255,255,0.5)')
+    bulgeG.addColorStop(0.5, `rgba(${cr},${cg},${cb},0.2)`)
+    bulgeG.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+    ctx.beginPath()
+    ctx.arc(0, 0, bulgeR, 0, Math.PI * 2)
+    ctx.fillStyle = bulgeG
+    ctx.fill()
+    ctx.restore()
+
+    const lineGrad = ctx.createLinearGradient(-diskR, 0, diskR, 0)
+    lineGrad.addColorStop(0, `rgba(${cr},${cg},${cb},0)`)
+    lineGrad.addColorStop(0.2, `rgba(${cr},${cg},${cb},0.1)`)
+    lineGrad.addColorStop(0.5, 'rgba(255,255,255,0.2)')
+    lineGrad.addColorStop(0.8, `rgba(${cr},${cg},${cb},0.1)`)
+    lineGrad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
+    ctx.beginPath()
+    ctx.moveTo(-diskR, 0)
+    ctx.lineTo(diskR, 0)
+    ctx.strokeStyle = lineGrad
+    ctx.lineWidth = 1.5
+    ctx.lineCap = 'round'
+    ctx.stroke()
+  }
+
+  const drawGalaxies = (time: number) => {
+    for (const gal of galaxies) {
+      ctx.save()
+      ctx.translate(gal.x, gal.y)
+      ctx.rotate(gal.rotation + time * gal.rotationSpeed)
+      ctx.scale(1, gal.tilt)
+      const cr = gal.color[0]!
+      const cg = gal.color[1]!
+      const cb = gal.color[2]!
+
+      switch (gal.type) {
+        case 'spiral':
+          drawSpiralGalaxy(gal, cr, cg, cb)
+          break
+        case 'elliptical':
+          drawEllipticalGalaxy(gal, cr, cg, cb)
+          break
+        case 'edge-on':
+          drawEdgeOnGalaxy(gal, cr, cg, cb)
+          break
+      }
+
+      ctx.restore()
+    }
   }
 
   const drawStars = (time: number) => {
@@ -492,6 +769,8 @@ onMounted(() => {
     ctx.clearRect(0, 0, width, height)
 
     if (props.dark) {
+      drawNebulae()
+      drawGalaxies(time)
       drawStars(time)
       drawShootingStars(dt)
     } else {
