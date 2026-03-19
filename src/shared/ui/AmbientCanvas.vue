@@ -115,6 +115,22 @@ interface Nebula {
   clouds: NebulaCloud[]
 }
 
+interface DriftCell {
+  x: number; y: number
+  vx: number; vy: number
+  radius: number
+  opacity: number
+  phase: number
+}
+
+interface Ripple {
+  x: number; y: number
+  radius: number
+  maxRadius: number
+  life: number
+  maxLife: number
+}
+
 type GalaxyType = 'spiral' | 'elliptical' | 'edge-on'
 
 interface Galaxy {
@@ -164,6 +180,9 @@ onMounted(() => {
   let symbiotes: Symbiote[] = []
   let nebulae: Nebula[] = []
   let galaxies: Galaxy[] = []
+  let cells: DriftCell[] = []
+  const ripples: Ripple[] = []
+  let rippleTimer = 0
   const spores: Spore[] = []
   const links: Link[] = []
   let width = 0
@@ -182,6 +201,7 @@ onMounted(() => {
     initSymbiotes()
     initNebulae()
     initGalaxies()
+    initCells()
   }
 
   const initStars = () => {
@@ -673,6 +693,98 @@ onMounted(() => {
     }
   }
 
+  const initCells = () => {
+    const count = Math.max(8, Math.floor((width * height) / 50000))
+    cells = Array.from({ length: count }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      radius: 3 + Math.random() * 6,
+      opacity: 0.06 + Math.random() * 0.06,
+      phase: Math.random() * Math.PI * 2,
+    }))
+  }
+
+  const drawCells = (time: number, dt: number) => {
+    const t = dt / 16
+    for (const c of cells) {
+      c.x += c.vx * t
+      c.y += c.vy * t
+
+      if (c.x < -c.radius * 2) { c.x = width + c.radius }
+      if (c.x > width + c.radius * 2) { c.x = -c.radius }
+      if (c.y < -c.radius * 2) { c.y = height + c.radius }
+      if (c.y > height + c.radius * 2) { c.y = -c.radius }
+
+      const wobble = 1 + Math.sin(time * 0.001 + c.phase) * 0.08
+      const r = c.radius * wobble
+
+      ctx.beginPath()
+      ctx.arc(c.x, c.y, r, 0, Math.PI * 2)
+      ctx.strokeStyle = `rgba(0,0,0,${c.opacity})`
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      const nucleusR = r * 0.3
+      const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, nucleusR)
+      g.addColorStop(0, `rgba(0,0,0,${c.opacity * 0.8})`)
+      g.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.beginPath()
+      ctx.arc(c.x, c.y, nucleusR, 0, Math.PI * 2)
+      ctx.fillStyle = g
+      ctx.fill()
+    }
+  }
+
+  const drawRipples = (dt: number) => {
+    rippleTimer += dt
+    if (rippleTimer > 3000 + Math.random() * 5000) {
+      rippleTimer = 0
+      ripples.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: 0,
+        maxRadius: 40 + Math.random() * 60,
+        life: 0,
+        maxLife: 2000 + Math.random() * 2000,
+      })
+    }
+
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const r = ripples[i]!
+      r.life += dt
+      const progress = r.life / r.maxLife
+
+      if (r.life >= r.maxLife) {
+        ripples.splice(i, 1)
+        continue
+      }
+
+      r.radius = progress * r.maxRadius
+
+      const alpha = progress < 0.15
+        ? (progress / 0.15) * 0.07
+        : 0.07 * (1 - (progress - 0.15) / 0.85)
+
+      ctx.beginPath()
+      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2)
+      ctx.strokeStyle = `rgba(0,0,0,${alpha})`
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      if (progress > 0.15 && progress < 0.6) {
+        const innerR = r.radius * 0.6
+        const innerAlpha = alpha * 0.5
+        ctx.beginPath()
+        ctx.arc(r.x, r.y, innerR, 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(0,0,0,${innerAlpha})`
+        ctx.lineWidth = 0.5
+        ctx.stroke()
+      }
+    }
+  }
+
   const drawSymbiotes = (time: number, dt: number) => {
     for (const s of symbiotes) {
       const breathe = 1 + Math.sin(time * s.pulseSpeed + s.pulse) * 0.15
@@ -774,6 +886,8 @@ onMounted(() => {
       drawStars(time)
       drawShootingStars(dt)
     } else {
+      drawCells(time, dt)
+      drawRipples(dt)
       drawLinks(dt)
       drawSymbiotes(time, dt)
       drawSpores(dt)
