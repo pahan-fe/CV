@@ -243,21 +243,21 @@ onMounted(() => {
 }
 
 .hero__name {
-  font-family: 'Darker Grotesque', sans-serif;
-  font-weight: 900;
+  font-family: 'Electroharmonix', sans-serif;
+  font-weight: 400;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   color: var(--fg);
 }
 
 .hero__first {
   display: block;
-  font-size: 4.5rem;
+  font-size: 3.5rem;
 }
 
 .hero__last {
   display: block;
-  font-size: 4.5rem;
+  font-size: 3.5rem;
   color: var(--muted);
 }
 
