@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { trackStorageError } from '~/shared/lib/trackStorageError'
 
 const CONSENT_KEY = 'analytics_consent'
 
@@ -6,16 +7,6 @@ export type ConsentStatus = 'granted' | 'declined' | null
 
 const status = ref<ConsentStatus>(null)
 let initialized = false
-
-const trackStorageError = (action: string, error: unknown) => {
-  const { gtag } = useGtag()
-  
-  console.warn(`[consent] localStorage ${action} failed:`, error)
-  gtag('event', 'storage_error', {
-    action,
-    error_message: error instanceof Error ? error.message : String(error),
-  })
-}
 
 const readStored = (): ConsentStatus => {
   try {

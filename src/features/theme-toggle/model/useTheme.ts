@@ -1,5 +1,7 @@
 import { ref } from 'vue'
 import { THEME_COLORS, THEME_STORAGE_KEY } from '~/shared/lib/theme'
+import { trackStorageError } from '~/shared/lib/trackStorageError'
+import { useThemeAnalytics } from '~/features/cookie-consent/model/useThemeAnalytics'
 
 export type Theme = 'light' | 'dark'
 
@@ -27,24 +29,43 @@ const init = () => {
     if (s === 'light' || s === 'dark') {
       theme.value = s
     }
-  } catch { /* ignored */ }
+  } catch (e) {
+    trackStorageError('read', e)
+  }
   apply(theme.value)
+}
+
+interface DocumentWithViewTransition extends Document {
+  startViewTransition: (cb: () => void) => void
+}
+
+const hasViewTransition = (doc: Document): doc is DocumentWithViewTransition => {
+  return 'startViewTransition' in doc
 }
 
 export function useTheme() {
   init()
 
+  const { start: startAnalytics, trackToggle } = useThemeAnalytics()
+
+  if (typeof window !== 'undefined') {
+    startAnalytics(theme.value)
+  }
+
   const toggleTheme = () => {
     theme.value = theme.value === 'dark' ? 'light' : 'dark'
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme.value)
-    } catch { /* ignored */ }
+    } catch (e) {
+      trackStorageError('write', e)
+    }
+
+    trackToggle(theme.value)
 
     const update = () => apply(theme.value)
 
-    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-      const start = document.startViewTransition as (cb: () => void) => void
-      start.call(document, update)
+    if (typeof document !== 'undefined' && hasViewTransition(document)) {
+      document.startViewTransition(update)
     } else {
       update()
     }

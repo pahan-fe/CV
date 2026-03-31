@@ -2,6 +2,7 @@
 import { useTheme } from './features/theme-toggle/model/useTheme'
 import { THEME_COLORS } from './shared/lib/theme'
 import AmbientCanvas from './shared/ui/AmbientCanvas.vue'
+import CookieConsent from './features/cookie-consent/ui/CookieConsent.vue'
 
 const url = useRequestURL()
 const siteName = 'Pavel Zagvozdin — CV'
@@ -87,6 +88,7 @@ useSeoMeta({
     <AmbientCanvas :dark="theme === 'dark'" />
     <div class="grain" />
     <div v-if="!isOnline" class="offline-banner">You're offline. Viewing cached content.</div>
+    <CookieConsent />
     <NuxtPage />
   </div>
 </template>
