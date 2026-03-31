@@ -20,14 +20,14 @@ const readStored = (): ConsentStatus => {
   return null
 }
 
-const grantGtag = () => {
+const updateGtag = (analyticsStorage: 'granted' | 'denied') => {
   const { gtag } = useGtag()
 
   gtag('consent', 'update', {
     ad_storage: 'denied',
     ad_personalization: 'denied',
     ad_user_data: 'denied',
-    analytics_storage: 'granted',
+    analytics_storage: analyticsStorage,
   })
 }
 
@@ -35,8 +35,8 @@ export const useConsent = () => {
   if (!initialized && typeof window !== 'undefined') {
     initialized = true
     status.value = readStored()
-    if (status.value === 'granted') {
-      grantGtag()
+    if (status.value === 'declined') {
+      updateGtag('denied')
     }
   }
 
@@ -47,7 +47,6 @@ export const useConsent = () => {
     } catch (e) {
       trackStorageError('write', e)
     }
-    grantGtag()
   }
 
   const decline = () => {
@@ -57,6 +56,7 @@ export const useConsent = () => {
     } catch (e) {
       trackStorageError('write', e)
     }
+    updateGtag('denied')
   }
 
   const shouldShow = computed(() => status.value === null)

@@ -29,10 +29,10 @@ const handleDecline = () => {
       <p class="consent-text">This site uses cookies for anonymous analytics.</p>
       <div class="consent-actions">
         <button class="consent-btn consent-btn--decline" @click="handleDecline">
-          Decline
+          Opt out
         </button>
         <button class="consent-btn consent-btn--accept" @click="handleAccept">
-          Accept
+          OK
         </button>
       </div>
     </div>
