@@ -25,6 +25,18 @@ export default defineNuxtConfig({
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
     'nuxt-schema-org',
+    ['nuxt-gtag', {
+      id: process.env.NUXT_PUBLIC_GTAG_ID || '',
+      initCommands: [
+        ['consent', 'default', {
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          ad_storage: 'denied',
+          analytics_storage: 'denied',
+          wait_for_update: 500,
+        }],
+      ],
+    }],
     ['@vite-pwa/nuxt', {
       registerType: 'prompt',
       devOptions: { enabled: false, suppressWarnings: true },
