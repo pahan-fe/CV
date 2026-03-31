@@ -35,10 +35,7 @@ const init = () => {
   apply(theme.value)
 }
 
-interface DocumentWithViewTransition extends Document {
-  startViewTransition: (cb: () => void) => void
-}
-
+type DocumentWithViewTransition = Document & { startViewTransition: (callback: () => void) => void }
 const hasViewTransition = (doc: Document): doc is DocumentWithViewTransition => {
   return 'startViewTransition' in doc
 }
