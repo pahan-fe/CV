@@ -11,7 +11,15 @@ body {
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .reveal { animation: none !important; opacity: 1 !important; }
+  .reveal-fade,
+  .reveal-slide-left,
+  .reveal-scale,
+  .reveal-slide-up,
+  [data-reveal-child] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
@@ -91,12 +99,59 @@ html[data-theme='light'] {
   animation-timing-function: ease-in-out;
 }
 
-@keyframes reveal {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+/* --- Scroll reveal animations --- */
+.reveal-fade,
+.reveal-slide-left,
+.reveal-scale,
+.reveal-slide-up {
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
-.reveal {
+.reveal-fade { transform: translateY(16px); }
+.reveal-slide-left { transform: translateX(-24px); }
+.reveal-scale { transform: scale(0.96); }
+.reveal-slide-up { transform: translateY(20px); }
+
+.revealed.reveal-fade,
+.revealed.reveal-slide-left,
+.revealed.reveal-scale,
+.revealed.reveal-slide-up {
+  opacity: 1;
+  transform: none;
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.revealed.reveal-slide-left {
+  transition-duration: 500ms;
+}
+
+.revealed--fast.reveal-fade,
+.revealed--fast.reveal-slide-left,
+.revealed--fast.reveal-scale,
+.revealed--fast.reveal-slide-up {
+  transition-duration: 100ms;
+  transition-delay: 0ms;
+}
+
+/* Stagger children */
+[data-reveal-child] {
   opacity: 0;
-  animation: reveal 0.5s ease-out forwards;
+  transform: translateY(8px);
+  will-change: transform, opacity;
+}
+
+.revealed [data-reveal-child],
+[data-reveal-child].revealed {
+  opacity: 1;
+  transform: none;
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.revealed--fast [data-reveal-child],
+[data-reveal-child].revealed--fast {
+  transition-duration: 80ms;
+  transition-delay: 0ms;
 }

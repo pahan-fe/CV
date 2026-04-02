@@ -130,7 +130,7 @@ export const createLightRenderer = (ctx: CanvasRenderingContext2D) => {
     }))
   }
 
-  const drawCells = (time: number, dt: number, w: number, h: number) => {
+  const drawCells = (time: number, dt: number, w: number, h: number, scrollY: number) => {
     const t = dt / 16
     for (const c of cells) {
       c.x += c.vx * t
@@ -141,21 +141,24 @@ export const createLightRenderer = (ctx: CanvasRenderingContext2D) => {
       if (c.y < -c.radius * 2) { c.y = h + c.radius }
       if (c.y > h + c.radius * 2) { c.y = -c.radius }
 
+      const parallax = scrollY * 0.05
+      const dy = c.y - parallax
+
       const wobble = 1 + Math.sin(time * 0.001 + c.phase) * 0.08
       const r = c.radius * wobble
 
       ctx.beginPath()
-      ctx.arc(c.x, c.y, r, 0, Math.PI * 2)
+      ctx.arc(c.x, dy, r, 0, Math.PI * 2)
       ctx.strokeStyle = `rgba(0,0,0,${c.opacity})`
       ctx.lineWidth = 1
       ctx.stroke()
 
       const nucleusR = r * 0.3
-      const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, nucleusR)
+      const g = ctx.createRadialGradient(c.x, dy, 0, c.x, dy, nucleusR)
       g.addColorStop(0, `rgba(0,0,0,${c.opacity * 0.8})`)
       g.addColorStop(1, 'rgba(0,0,0,0)')
       ctx.beginPath()
-      ctx.arc(c.x, c.y, nucleusR, 0, Math.PI * 2)
+      ctx.arc(c.x, dy, nucleusR, 0, Math.PI * 2)
       ctx.fillStyle = g
       ctx.fill()
     }
@@ -226,7 +229,7 @@ export const createLightRenderer = (ctx: CanvasRenderingContext2D) => {
     })
   }
 
-  const drawSpores = (dt: number, w: number, h: number) => {
+  const drawSpores = (dt: number, w: number, h: number, scrollY: number) => {
     sporeTimer += dt
     if (sporeTimer > 800 + Math.random() * 1500) {
       sporeTimer = 0
@@ -254,29 +257,33 @@ export const createLightRenderer = (ctx: CanvasRenderingContext2D) => {
         continue
       }
 
+      const parallax = scrollY * 0.15
+      const dx = s.x
+      const dy = s.y - parallax
+
       const speed = Math.sqrt(s.vx * s.vx + s.vy * s.vy)
       const nx = -s.vx / speed
       const ny = -s.vy / speed
       const tailLen = 15 + speed * 8
 
-      const grad = ctx.createLinearGradient(s.x, s.y, s.x + nx * tailLen, s.y + ny * tailLen)
+      const grad = ctx.createLinearGradient(dx, dy, dx + nx * tailLen, dy + ny * tailLen)
       grad.addColorStop(0, `rgba(0,0,0,${alpha * 0.12})`)
       grad.addColorStop(0.5, `rgba(0,0,0,${alpha * 0.05})`)
       grad.addColorStop(1, 'rgba(0,0,0,0)')
 
       ctx.beginPath()
-      ctx.moveTo(s.x, s.y)
-      ctx.lineTo(s.x + nx * tailLen, s.y + ny * tailLen)
+      ctx.moveTo(dx, dy)
+      ctx.lineTo(dx + nx * tailLen, dy + ny * tailLen)
       ctx.strokeStyle = grad
       ctx.lineWidth = 1
       ctx.lineCap = 'round'
       ctx.stroke()
 
-      const headGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size)
+      const headGrad = ctx.createRadialGradient(dx, dy, 0, dx, dy, s.size)
       headGrad.addColorStop(0, `rgba(0,0,0,${alpha * 0.15})`)
       headGrad.addColorStop(1, 'rgba(0,0,0,0)')
       ctx.beginPath()
-      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2)
+      ctx.arc(dx, dy, s.size, 0, Math.PI * 2)
       ctx.fillStyle = headGrad
       ctx.fill()
     }
@@ -354,14 +361,18 @@ export const createLightRenderer = (ctx: CanvasRenderingContext2D) => {
     }
   }
 
-  const drawSymbiotes = (time: number, dt: number) => {
+  const drawSymbiotes = (time: number, dt: number, scrollY: number) => {
     for (const s of symbiotes) {
       const breathe = 1 + Math.sin(time * s.pulseSpeed + s.pulse) * 0.15
 
+      const parallax = scrollY * 0.10
+      const sx = s.x
+      const sy = s.y - parallax
+
       for (const b of s.blobs) {
         const drift = Math.sin(time * b.speed + b.phase) * 3
-        const bx = s.x + b.ox + drift
-        const by = s.y + b.oy + Math.cos(time * b.speed + b.phase) * 2
+        const bx = sx + b.ox + drift
+        const by = sy + b.oy + Math.cos(time * b.speed + b.phase) * 2
         const br = b.r * breathe
         const g = ctx.createRadialGradient(bx, by, 0, bx, by, br)
         g.addColorStop(0, `rgba(0, 0, 0, ${s.opacity})`)
@@ -416,8 +427,8 @@ export const createLightRenderer = (ctx: CanvasRenderingContext2D) => {
         }
 
         const steps = Math.ceil(t.len / 2)
-        const startX = s.x + Math.cos(t.angle) * r * 0.6
-        const startY = s.y + Math.sin(t.angle) * r * 0.6
+        const startX = sx + Math.cos(t.angle) * r * 0.6
+        const startY = sy + Math.sin(t.angle) * r * 0.6
 
         ctx.beginPath()
         ctx.moveTo(startX, startY)
@@ -448,12 +459,12 @@ export const createLightRenderer = (ctx: CanvasRenderingContext2D) => {
       initSymbiotes(w, h)
       initCells(w, h)
     },
-    draw(time: number, dt: number, w: number, h: number) {
-      drawCells(time, dt, w, h)
+    draw(time: number, dt: number, w: number, h: number, scrollY: number) {
+      drawCells(time, dt, w, h, scrollY)
       drawRipples(dt, w, h)
       drawLinks(dt)
-      drawSymbiotes(time, dt)
-      drawSpores(dt, w, h)
+      drawSymbiotes(time, dt, scrollY)
+      drawSpores(dt, w, h, scrollY)
     },
   }
 }

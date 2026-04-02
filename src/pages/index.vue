@@ -6,6 +6,9 @@ import { education } from '~/entities/education'
 import { languages } from '~/entities/languages'
 import { articles } from '~/entities/articles'
 import { skillCategories } from '~/entities/skills'
+import { useScrollReveal } from '~/shared/lib/useScrollReveal'
+
+const { observe, observeChildren } = useScrollReveal()
 
 const url = useRequestURL()
 useSeoMeta({
@@ -30,6 +33,17 @@ const activeSection = ref<Section>(sections[0])
 
 const typedRole = ref('')
 const showCursor = ref(true)
+
+const summaryRef = ref<HTMLElement>()
+const experienceRef = ref<HTMLElement>()
+const educationRef = ref<HTMLElement>()
+const languagesRef = ref<HTMLElement>()
+const skillsRef = ref<HTMLElement>()
+const articlesRef = ref<HTMLElement>()
+const contactRef = ref<HTMLElement>()
+
+const timelineProgress = ref(0)
+const activeDots = ref<Set<number>>(new Set())
 
 onMounted(() => {
   const text = profile.role
@@ -65,6 +79,32 @@ onMounted(() => {
     }
 
     activeSection.value = current
+
+    const timelineEl = document.getElementById('experience')
+    if (timelineEl) {
+      const rect = timelineEl.getBoundingClientRect()
+      const sectionTop = rect.top + window.scrollY
+      const sectionHeight = rect.height
+      const viewportHeight = window.innerHeight
+      const raw = (window.scrollY - sectionTop) / (sectionHeight - viewportHeight)
+      timelineProgress.value = Math.max(0, Math.min(1, raw))
+
+      const entries = timelineEl.querySelectorAll('.timeline__entry')
+      entries.forEach((entry, i) => {
+        const dot = entry.querySelector('.timeline__dot') as HTMLElement
+        if (!dot) { return }
+        const dotRect = dot.getBoundingClientRect()
+        const timelineRect = timelineEl.getBoundingClientRect()
+        const dotRelativePos = (dotRect.top - timelineRect.top) / timelineRect.height
+
+        if (timelineProgress.value >= dotRelativePos) {
+          if (!activeDots.value.has(i)) {
+            activeDots.value.add(i)
+            dot.classList.add('timeline__dot--active')
+          }
+        }
+      })
+    }
   }
 
   window.addEventListener('scroll', onScroll, { passive: true })
@@ -74,11 +114,21 @@ onMounted(() => {
     window.removeEventListener('scroll', onScroll)
   })
 })
+
+onMounted(() => {
+  observe(summaryRef.value)
+  observeChildren(experienceRef.value, 150)
+  observe(educationRef.value)
+  observe(languagesRef.value, 40)
+  observe(skillsRef.value, 40)
+  observe(articlesRef.value, 60)
+  observe(contactRef.value, 100)
+})
 </script>
 
 <template>
   <main class="cv">
-    <header class="hero reveal">
+    <header class="hero">
       <div class="hero__id">
         <h1 class="hero__name">
           <span class="hero__first">{{ profile.name.split(' ')[0] }}</span>
@@ -88,23 +138,23 @@ onMounted(() => {
           <span>{{ typedRole }}</span><span v-if="showCursor" class="hero__cursor">|</span>
         </p>
       </div>
-      <ThemeToggle />
     </header>
+    <ThemeToggle class="theme-toggle-sticky" />
 
     <aside class="sidebar">
       <SidebarNav :active-section="activeSection" />
     </aside>
 
     <section class="content">
-      <section v-if="profile.summary" id="summary" class="block reveal" style="animation-delay: 0.15s">
+      <section v-if="profile.summary" id="summary" ref="summaryRef" class="block reveal-fade">
         <h2 class="section-title">Summary</h2>
         <p class="summary">{{ profile.summary }}</p>
       </section>
 
-      <section id="experience" class="block reveal" style="animation-delay: 0.2s">
+      <section id="experience" ref="experienceRef" class="block">
         <h2 class="section-title">Experience</h2>
-        <div class="timeline">
-          <article v-for="(item, i) in experience" :key="i" class="timeline__entry">
+        <div class="timeline" :style="{ '--tl-progress': timelineProgress }">
+          <article v-for="(item, i) in experience" :key="i" class="timeline__entry" data-reveal-child>
             <div class="timeline__dot" />
             <div class="card">
               <header class="card__header">
@@ -138,7 +188,7 @@ onMounted(() => {
         </div>
       </section>
 
-      <section id="education" class="block reveal" style="animation-delay: 0.25s">
+      <section id="education" ref="educationRef" class="block reveal-scale">
         <h2 class="section-title">Education</h2>
         <div class="card">
           <template v-for="(ed, i) in education" :key="i">
@@ -156,27 +206,27 @@ onMounted(() => {
         </div>
       </section>
 
-      <section id="languages" class="block reveal" style="animation-delay: 0.3s">
+      <section id="languages" ref="languagesRef" class="block reveal-fade">
         <h2 class="section-title">Languages</h2>
         <ul class="tags">
-          <li v-for="l in languages" :key="l" class="tag">{{ l }}</li>
+          <li v-for="l in languages" :key="l" class="tag" data-reveal-child>{{ l }}</li>
         </ul>
       </section>
 
-      <section id="skills" class="block reveal mobile-only" style="animation-delay: 0.32s">
+      <section id="skills" ref="skillsRef" class="block reveal-fade mobile-only">
         <h2 class="section-title">Skills</h2>
         <div v-for="cat in skillCategories" :key="cat.label" class="skill-group">
           <h3 class="skill-group__label">{{ cat.label }}</h3>
           <ul class="tags">
-            <li v-for="s in cat.skills" :key="s" class="tag">{{ s }}</li>
+            <li v-for="s in cat.skills" :key="s" class="tag" data-reveal-child>{{ s }}</li>
           </ul>
         </div>
       </section>
 
-      <section id="articles" class="block reveal" style="animation-delay: 0.35s">
+      <section id="articles" ref="articlesRef" class="block reveal-slide-up">
         <h2 class="section-title">Articles</h2>
         <ul class="articles-list">
-          <li v-for="article in articles" :key="article.url" class="article-item">
+          <li v-for="article in articles" :key="article.url" class="article-item" data-reveal-child>
             <a :href="article.url" target="_blank" rel="noopener" class="article-link">
               <span class="article-link__title">{{ article.title }}</span>
               <span v-if="article.description" class="article-link__desc">{{ article.description }}</span>
@@ -186,10 +236,10 @@ onMounted(() => {
         </ul>
       </section>
 
-      <section id="contact" class="block reveal" style="animation-delay: 0.4s">
+      <section id="contact" ref="contactRef" class="block reveal-slide-up">
         <h2 class="section-title">Contact</h2>
         <div class="contact-grid">
-          <a :href="profile.email" class="contact-card">
+          <a :href="profile.email" class="contact-card" data-reveal-child>
             <svg class="contact-card__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="4" width="20" height="16" rx="2" />
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
@@ -197,14 +247,14 @@ onMounted(() => {
             <span class="contact-card__label">Email</span>
             <span class="contact-card__value">{{ profile.email.replace('mailto:', '') }}</span>
           </a>
-          <a :href="profile.linkedin" target="_blank" rel="noopener" class="contact-card">
+          <a :href="profile.linkedin" target="_blank" rel="noopener" class="contact-card" data-reveal-child>
             <svg class="contact-card__icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z" />
             </svg>
             <span class="contact-card__label">LinkedIn</span>
             <span class="contact-card__value">pahanz</span>
           </a>
-          <a :href="profile.github" target="_blank" rel="noopener" class="contact-card">
+          <a :href="profile.github" target="_blank" rel="noopener" class="contact-card" data-reveal-child>
             <svg class="contact-card__icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
             </svg>
@@ -235,11 +285,17 @@ onMounted(() => {
   grid-area: hero;
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 16px;
   padding: 32px 0 40px;
   border-bottom: 1px solid var(--border);
   min-width: 0;
+}
+
+.theme-toggle-sticky {
+  position: fixed;
+  top: 24px;
+  right: max(24px, calc((100vw - 1100px) / 2 + 24px));
+  z-index: 100;
 }
 
 .hero__name {
@@ -329,6 +385,26 @@ onMounted(() => {
   bottom: 12px;
   width: 1px;
   background: var(--border);
+  clip-path: inset(0 0 calc((1 - var(--tl-progress, 1)) * 100%) 0);
+  transition: clip-path 50ms linear;
+}
+
+.timeline::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  width: 3px;
+  top: 12px;
+  bottom: 12px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent calc(var(--tl-progress, 1) * 100% - 40px),
+    var(--fg) calc(var(--tl-progress, 1) * 100%)
+  );
+  clip-path: inset(0 0 calc((1 - var(--tl-progress, 1)) * 100%) 0);
+  opacity: 0.6;
+  border-radius: 2px;
 }
 
 .timeline__entry {
@@ -351,11 +427,19 @@ onMounted(() => {
   border: 2px solid var(--muted);
   background: var(--bg);
   z-index: 1;
+  transition: transform 300ms ease-out, border-color 300ms, background-color 300ms;
 }
 
-.timeline__entry:first-child .timeline__dot {
-  border-color: var(--fg);
-  background: var(--fg);
+.timeline__dot--active {
+  border-color: var(--fg) !important;
+  background: var(--fg) !important;
+  animation: dot-pulse 600ms ease-out forwards;
+}
+
+@keyframes dot-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 var(--fg); }
+  40% { transform: scale(1.5); box-shadow: 0 0 0 4px color-mix(in srgb, var(--fg) 40%, transparent); }
+  100% { transform: scale(1); box-shadow: 0 0 0 8px transparent; }
 }
 
 .card {
@@ -672,6 +756,13 @@ onMounted(() => {
   margin-bottom: 8px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .timeline::before { clip-path: none; }
+  .timeline::after { display: none; }
+  .timeline__dot { transition: none; }
+  .timeline__dot--active { animation: none; }
+}
+
 @media (max-width: 900px) {
   .mobile-only {
     display: block;
@@ -710,6 +801,7 @@ onMounted(() => {
   .cv { padding: 24px 12px 48px; }
   .hero__first, .hero__last { font-size: 2.2rem; }
   .hero { flex-wrap: wrap; }
+  .theme-toggle-sticky { top: 56px; right: 12px; }
   .card { padding: 14px; }
   .tag { font-size: 0.75rem; padding: 3px 8px; }
   .contact-grid { grid-template-columns: 1fr; }
@@ -726,7 +818,16 @@ onMounted(() => {
     grid-template-areas: 'hero' 'content';
   }
   .sidebar { display: none; }
+  .theme-toggle-sticky { display: none; }
   .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .reveal { animation: none !important; opacity: 1 !important; }
+  .reveal-fade, .reveal-slide-left, .reveal-scale, .reveal-slide-up,
+  [data-reveal-child] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .timeline::before { clip-path: none; }
+  .timeline::after { display: none; }
+  .timeline__dot--active { transform: none; animation: none; }
 }
 </style>

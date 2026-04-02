@@ -2,7 +2,7 @@
 import { createDarkRenderer } from './ambient/draw-dark'
 import { createLightRenderer } from './ambient/draw-light'
 
-const props = defineProps<{ dark: boolean }>()
+const props = defineProps<{ dark: boolean; scrollY: number }>()
 
 const canvas = ref<HTMLCanvasElement>()
 let animationId: number
@@ -29,16 +29,20 @@ onMounted(() => {
     light.init(width, height)
   }
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   let lastTime = 0
   const draw = (time: number) => {
     const dt = lastTime ? time - lastTime : 16
     lastTime = time
     ctx.clearRect(0, 0, width, height)
 
+    const sy = reducedMotion ? 0 : props.scrollY
+
     if (props.dark) {
-      dark.draw(time, dt, width, height)
+      dark.draw(time, dt, width, height, sy)
     } else {
-      light.draw(time, dt, width, height)
+      light.draw(time, dt, width, height, sy)
     }
 
     animationId = requestAnimationFrame(draw)

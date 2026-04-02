@@ -23,8 +23,10 @@ const faviconLinks = import.meta.dev
     ]
 
 const isOnline = ref(true)
+const scrollY = ref(0)
 let onOnline: () => void
 let onOffline: () => void
+let scrollRaf: number
 
 onMounted(() => {
   isOnline.value = navigator.onLine
@@ -36,6 +38,12 @@ onMounted(() => {
   }
   window.addEventListener('online', onOnline)
   window.addEventListener('offline', onOffline)
+
+  const updateScroll = () => {
+    scrollY.value = window.scrollY
+    scrollRaf = requestAnimationFrame(updateScroll)
+  }
+  updateScroll()
 })
 
 onBeforeUnmount(() => {
@@ -45,6 +53,7 @@ onBeforeUnmount(() => {
   if (onOffline) {
     window.removeEventListener('offline', onOffline)
   }
+  cancelAnimationFrame(scrollRaf)
 })
 
 useHead({
@@ -85,7 +94,7 @@ useSeoMeta({
 
 <template>
   <div id="app">
-    <AmbientCanvas :dark="theme === 'dark'" />
+    <AmbientCanvas :dark="theme === 'dark'" :scroll-y="scrollY" />
     <div class="grain" />
     <div v-if="!isOnline" class="offline-banner">You're offline. Viewing cached content.</div>
     <CookieConsent />

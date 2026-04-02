@@ -130,11 +130,12 @@ export const createDarkRenderer = (ctx: CanvasRenderingContext2D) => {
     })
   }
 
-  const drawNebulae = () => {
+  const drawNebulae = (scrollY: number) => {
     for (const n of nebulae) {
       for (const c of n.clouds) {
         const cx = n.x + c.ox
-        const cy = n.y + c.oy
+        const parallax = scrollY * 0.08
+        const cy = n.y + c.oy - parallax
         const [cr, cg, cb] = c.color
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, c.r)
         g.addColorStop(0, `rgba(${cr},${cg},${cb},${c.opacity})`)
@@ -282,10 +283,11 @@ export const createDarkRenderer = (ctx: CanvasRenderingContext2D) => {
     ctx.stroke()
   }
 
-  const drawGalaxies = (time: number) => {
+  const drawGalaxies = (time: number, scrollY: number) => {
     for (const gal of galaxies) {
       ctx.save()
-      ctx.translate(gal.x, gal.y)
+      const parallax = scrollY * 0.08
+      ctx.translate(gal.x, gal.y - parallax)
       ctx.rotate(gal.rotation + time * gal.rotationSpeed)
       ctx.scale(1, gal.tilt)
       const cr = gal.color[0]!
@@ -308,17 +310,19 @@ export const createDarkRenderer = (ctx: CanvasRenderingContext2D) => {
     }
   }
 
-  const drawStars = (time: number) => {
+  const drawStars = (time: number, scrollY: number) => {
     for (const s of stars) {
       const flicker = (Math.sin(time * s.speed + s.phase) + 1) / 2
       const alpha = 0.3 + flicker * 0.7
       const [cr, cg, cb] = s.color
-      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.radius)
+      const parallax = s.radius > 1.5 ? scrollY * 0.12 : scrollY * 0.05
+      const sy = s.y - parallax
+      const g = ctx.createRadialGradient(s.x, sy, 0, s.x, sy, s.radius)
       g.addColorStop(0, `rgba(${cr},${cg},${cb},${alpha})`)
       g.addColorStop(0.4, `rgba(${cr},${cg},${cb},${alpha * 0.5})`)
       g.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
       ctx.beginPath()
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2)
+      ctx.arc(s.x, sy, s.radius, 0, Math.PI * 2)
       ctx.fillStyle = g
       ctx.fill()
     }
@@ -407,10 +411,10 @@ export const createDarkRenderer = (ctx: CanvasRenderingContext2D) => {
       initNebulae(w, h)
       initGalaxies(w, h)
     },
-    draw(time: number, dt: number, w: number, h: number) {
-      drawNebulae()
-      drawGalaxies(time)
-      drawStars(time)
+    draw(time: number, dt: number, w: number, h: number, scrollY: number) {
+      drawNebulae(scrollY)
+      drawGalaxies(time, scrollY)
+      drawStars(time, scrollY)
       drawShootingStars(dt, w, h)
     },
   }
