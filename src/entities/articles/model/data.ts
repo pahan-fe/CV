@@ -13,7 +13,7 @@ export const articles: Article[] = [
   },
   {
     title: 'Our Yarn Odyssey',
-    url: 'https://medium.com/dodoengineering/our-yarn-odyssey-f40e668e7bfa',
+    url: 'https://medium.com/dodoengineering/our-yarn-odyssey-f4d16b42ebbd',
     description: 'Exploring the transition to modern package management, sharing practical insights on dependency resolution, Zero Installs, and the trade-offs of the Yarn ecosystem.',
   },
 ]
