@@ -7,8 +7,10 @@ import { languages } from '~/entities/languages'
 import { articles } from '~/entities/articles'
 import { skillCategories } from '~/entities/skills'
 import { useScrollReveal } from '~/shared/lib/useScrollReveal'
+import { useTheme } from '~/features/theme-toggle/model/useTheme'
 
 const { observe, observeChildren } = useScrollReveal()
+const { theme } = useTheme()
 
 const url = useRequestURL()
 useSeoMeta({
@@ -156,7 +158,7 @@ onMounted(() => {
         <div class="timeline" :style="{ '--tl-progress': timelineProgress }">
           <article v-for="(item, i) in experience" :key="i" class="timeline__entry" data-reveal-child>
             <div class="timeline__dot" />
-            <div class="card">
+            <div class="card" :data-drift="theme" :style="{ '--card-i': i }">
               <header class="card__header">
                 <div>
                   <h3 class="card__title">{{ item.role }}</h3>
@@ -190,7 +192,7 @@ onMounted(() => {
 
       <section id="education" ref="educationRef" class="block reveal-scale">
         <h2 class="section-title">Education</h2>
-        <div class="card">
+        <div class="card" :data-drift="theme" style="--card-i: 0">
           <template v-for="(ed, i) in education" :key="i">
             <header class="card__header">
               <div>
@@ -226,8 +228,8 @@ onMounted(() => {
       <section id="articles" ref="articlesRef" class="block reveal-slide-up">
         <h2 class="section-title">Articles</h2>
         <ul class="articles-list">
-          <li v-for="article in articles" :key="article.url" class="article-item" data-reveal-child>
-            <a :href="article.url" target="_blank" rel="noopener" class="article-link">
+          <li v-for="(article, i) in articles" :key="article.url" class="article-item" data-reveal-child>
+            <a :href="article.url" target="_blank" rel="noopener" class="article-link" :data-drift="theme" :style="{ '--card-i': i }">
               <span class="article-link__title">{{ article.title }}</span>
               <span v-if="article.description" class="article-link__desc">{{ article.description }}</span>
               <span class="article-link__arrow">&rarr;</span>
@@ -485,6 +487,90 @@ onMounted(() => {
   syntax: "<angle>";
   inherits: false;
   initial-value: 0deg;
+}
+
+/* Dark: elliptical orbit — traces a tilted ellipse */
+@keyframes card-orbit {
+  0%      { transform: translate(6px, 0)      scale(1.005); }
+  8.3%    { transform: translate(5.2px, 1.8px) scale(1.004); }
+  16.7%   { transform: translate(3px, 3px)     scale(1.002); }
+  25%     { transform: translate(0, 3.5px)     scale(1); }
+  33.3%   { transform: translate(-3px, 3px)    scale(1); }
+  41.7%   { transform: translate(-5.2px, 1.8px) scale(1.002); }
+  50%     { transform: translate(-6px, 0)      scale(1.005); }
+  58.3%   { transform: translate(-5.2px, -1.8px) scale(1.004); }
+  66.7%   { transform: translate(-3px, -3px)   scale(1.002); }
+  75%     { transform: translate(0, -3.5px)    scale(1); }
+  83.3%   { transform: translate(3px, -3px)    scale(1); }
+  91.7%   { transform: translate(5.2px, -1.8px) scale(1.002); }
+  100%    { transform: translate(6px, 0)       scale(1.005); }
+}
+
+/* Light: serpentine wave — horizontal sinusoidal with subtle vertical wobble */
+@keyframes card-wave {
+  0%      { transform: translate(0, 0)          scale(1); }
+  12.5%   { transform: translate(4.2px, 1.2px)  scale(1.003); }
+  25%     { transform: translate(6px, 0)         scale(1.005); }
+  37.5%   { transform: translate(4.2px, -1.2px)  scale(1.003); }
+  50%     { transform: translate(0, 0)           scale(1); }
+  62.5%   { transform: translate(-4.2px, 1.2px)  scale(1.003); }
+  75%     { transform: translate(-6px, 0)        scale(1.005); }
+  87.5%   { transform: translate(-4.2px, -1.2px) scale(1.003); }
+  100%    { transform: translate(0, 0)           scale(1); }
+}
+
+/* Dark articles: smaller orbit, no scale */
+@keyframes article-orbit {
+  0%      { transform: translate(3px, 0); }
+  8.3%    { transform: translate(2.6px, 0.9px); }
+  16.7%   { transform: translate(1.5px, 1.5px); }
+  25%     { transform: translate(0, 1.8px); }
+  33.3%   { transform: translate(-1.5px, 1.5px); }
+  41.7%   { transform: translate(-2.6px, 0.9px); }
+  50%     { transform: translate(-3px, 0); }
+  58.3%   { transform: translate(-2.6px, -0.9px); }
+  66.7%   { transform: translate(-1.5px, -1.5px); }
+  75%     { transform: translate(0, -1.8px); }
+  83.3%   { transform: translate(1.5px, -1.5px); }
+  91.7%   { transform: translate(2.6px, -0.9px); }
+  100%    { transform: translate(3px, 0); }
+}
+
+/* Light articles: smaller serpentine sway, no scale */
+@keyframes article-wave {
+  0%      { transform: translate(0, 0); }
+  12.5%   { transform: translate(2px, 0.6px); }
+  25%     { transform: translate(3px, 0); }
+  37.5%   { transform: translate(2px, -0.6px); }
+  50%     { transform: translate(0, 0); }
+  62.5%   { transform: translate(-2px, 0.6px); }
+  75%     { transform: translate(-3px, 0); }
+  87.5%   { transform: translate(-2px, -0.6px); }
+  100%    { transform: translate(0, 0); }
+}
+
+.card[data-drift='dark'] {
+  animation: card-orbit 10s linear infinite;
+  animation-delay: calc(var(--card-i, 0) * -2s);
+  will-change: transform;
+}
+
+.card[data-drift='light'] {
+  animation: card-wave 9s linear infinite;
+  animation-delay: calc(var(--card-i, 0) * -2s);
+  will-change: transform;
+}
+
+.article-link[data-drift='dark'] {
+  animation: article-orbit 8s linear infinite;
+  animation-delay: calc(var(--card-i, 0) * -2s);
+  will-change: transform;
+}
+
+.article-link[data-drift='light'] {
+  animation: article-wave 8s linear infinite;
+  animation-delay: calc(var(--card-i, 0) * -2s);
+  will-change: transform;
 }
 
 .card__header {
@@ -757,6 +843,7 @@ onMounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .card, .article-link { animation: none; transform: none !important; will-change: auto; }
   .timeline::before { clip-path: none; }
   .timeline::after { display: none; }
   .timeline__dot { transition: none; }
@@ -819,6 +906,7 @@ onMounted(() => {
   }
   .sidebar { display: none; }
   .theme-toggle-sticky { display: none; }
+  .card, .article-link { animation: none; transform: none !important; will-change: auto; }
   .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .reveal-fade, .reveal-slide-left, .reveal-scale, .reveal-slide-up,
   [data-reveal-child] {
