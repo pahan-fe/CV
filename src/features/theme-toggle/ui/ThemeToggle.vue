@@ -16,7 +16,7 @@ const { theme, toggleTheme } = useTheme()
     <span class="theme-toggle__ring theme-toggle__ring--2" aria-hidden="true" />
     <span class="theme-toggle__ring theme-toggle__ring--3" aria-hidden="true" />
     <ClientOnly>
-      <!-- Light mode: spiral galaxy. Dark mode: symbiote. -->
+      <!-- Light: spiral galaxy. Dark: symbiote. -->
       <svg v-if="theme === 'light'" class="theme-toggle__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M12 12c1-4 4-7 8-7" />
         <path d="M12 12c-1 4-4 7-8 7" />
@@ -47,7 +47,7 @@ const { theme, toggleTheme } = useTheme()
   appearance: none;
   position: relative;
   border: 0;
-  background: var(--card);
+  background: transparent;
   color: var(--muted);
   border-radius: 10px;
   width: 40px;
@@ -57,6 +57,27 @@ const { theme, toggleTheme } = useTheme()
   justify-content: center;
   cursor: pointer;
   transition: color 200ms;
+}
+
+/* Solid bg as positioned child with z-index:0 — paints ABOVE z-index:-1 children
+   so disk/ring/halo bases are hidden inside the button rect. */
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--card);
+  border-radius: inherit;
+  z-index: 0;
+}
+
+/* Theme-specific halo (box-shadow) is attached here */
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .theme-toggle:hover {
@@ -70,27 +91,30 @@ const { theme, toggleTheme } = useTheme()
 
 .theme-toggle__icon {
   display: block;
+  position: relative;
+  z-index: 1;
+  --wink-color: 255, 255, 255;
   animation: icon-wink 4s ease-out 3s infinite;
   will-change: transform, filter;
 }
 
-/* Black-hole layers — only rendered in dark theme */
+/* Layer defaults: hidden + shared positioning. Theme rules switch display:block. */
 .theme-toggle__disk,
 .theme-toggle__ring {
   display: none;
-}
-
-/* ============ DARK theme: black hole + accretion disk ============ */
-html[data-theme='dark'] .theme-toggle {
-  background: #000;
-  border-radius: 50%;
-}
-
-html[data-theme='dark'] .theme-toggle__disk {
-  display: block;
   position: absolute;
   inset: -10px;
   border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ============ DARK theme: black hole + accretion disk ============ */
+html[data-theme='dark'] .theme-toggle { border-radius: 50%; }
+html[data-theme='dark'] .theme-toggle::before { background: #000; }
+
+html[data-theme='dark'] .theme-toggle__disk {
+  display: block;
+  z-index: -1;
   background: conic-gradient(
     from var(--disk-angle, 0deg),
     transparent 0deg,
@@ -109,23 +133,16 @@ html[data-theme='dark'] .theme-toggle__disk {
     transparent 360deg
   );
   filter: blur(15px);
-  z-index: -1;
   animation: disk-spin 4.5s linear infinite;
-  /* Mask out the centre so the disk is a ring, not a filled circle */
   -webkit-mask: radial-gradient(circle, transparent 19px, #000 26px);
   mask: radial-gradient(circle, transparent 19px, #000 26px);
 }
 
 html[data-theme='dark'] .theme-toggle__ring {
   display: block;
-  position: absolute;
-  inset: -10px;
-  border-radius: 50%;
+  z-index: -2;
   border: 3px solid rgba(255, 170, 70, 0.55);
   filter: blur(3.5px);
-  pointer-events: none;
-  /* Below button bg → ring vanishes once it shrinks past the event horizon */
-  z-index: -2;
   animation: suck 3s cubic-bezier(0.55, 0.05, 0.7, 0.4) infinite;
 }
 
@@ -133,16 +150,29 @@ html[data-theme='dark'] .theme-toggle__ring--1 { animation-delay: 0s; }
 html[data-theme='dark'] .theme-toggle__ring--2 { animation-delay: -1s; }
 html[data-theme='dark'] .theme-toggle__ring--3 { animation-delay: -2s; }
 
-/* ============ LIGHT theme: soft white halo ============ */
-html[data-theme='light'] .theme-toggle::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  pointer-events: none;
-  z-index: -1;
-  animation: halo-pulse 5s ease-in-out 2.1s infinite;
+/* ============ LIGHT theme: bioluminescent cell ============ */
+html[data-theme='light'] .theme-toggle {
+  border-radius: 50%;
+  animation: breathe 5s ease-in-out infinite;
 }
+
+html[data-theme='light'] .theme-toggle::after {
+  animation: bioluminesce 5s ease-in-out infinite;
+}
+
+html[data-theme='light'] .theme-toggle__icon { --wink-color: 20, 184, 166; }
+
+html[data-theme='light'] .theme-toggle__ring {
+  display: block;
+  z-index: -2;
+  border: 1.5px solid rgba(20, 184, 166, 0.55);
+  filter: blur(2px);
+  animation: bloom 4s ease-out infinite;
+}
+
+html[data-theme='light'] .theme-toggle__ring--1 { animation-delay: 0s; }
+html[data-theme='light'] .theme-toggle__ring--2 { animation-delay: -1.3s; }
+html[data-theme='light'] .theme-toggle__ring--3 { animation-delay: -2.6s; }
 
 /* ============ Keyframes ============ */
 
@@ -163,24 +193,36 @@ html[data-theme='light'] .theme-toggle::after {
   100% { transform: scale(0.4) rotate(140deg); opacity: 0; }
 }
 
-@keyframes halo-pulse {
-  0%, 100% { box-shadow: 0 0 22px rgba(255, 255, 255, 0.18); }
-  50%      { box-shadow: 0 0 38px rgba(255, 255, 255, 0.32); }
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+@keyframes bioluminesce {
+  0%, 100% { box-shadow: 0 0 18px rgba(20, 184, 166, 0.35); }
+  50%      { box-shadow: 0 0 32px rgba(20, 184, 166, 0.55); }
+}
+
+@keyframes bloom {
+  0%   { transform: scale(0.5); opacity: 0; }
+  15%  { opacity: 0.8; }
+  60%  { opacity: 0.45; }
+  100% { transform: scale(2.2); opacity: 0; }
 }
 
 @keyframes icon-wink {
   0%, 82%, 100% { transform: scale(1);    filter: drop-shadow(0 0 0 transparent); }
-  87%           { transform: scale(1.20); filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7)); }
-  92%           { transform: scale(0.96); filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3)); }
+  87%           { transform: scale(1.20); filter: drop-shadow(0 0 8px rgba(var(--wink-color), 0.7)); }
+  92%           { transform: scale(0.96); filter: drop-shadow(0 0 2px rgba(var(--wink-color), 0.3)); }
   96%           { transform: scale(1);    filter: drop-shadow(0 0 0 transparent); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .theme-toggle,
+  .theme-toggle::after,
   .theme-toggle__disk,
   .theme-toggle__ring,
-  .theme-toggle__icon,
-  .theme-toggle::after {
+  .theme-toggle__icon {
     animation: none !important;
   }
   .theme-toggle__icon { opacity: 0.85; }
