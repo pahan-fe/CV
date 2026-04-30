@@ -24,14 +24,26 @@ const init = () => {
   }
   initialized = true
 
-  try {
-    const s = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null
-    if (s === 'light' || s === 'dark') {
-      theme.value = s
+  // The boot script in nuxt.config.ts has already resolved the theme
+  // (localStorage → prefers-color-scheme → light) and written it to
+  // <html data-theme>. Mirror that into the ref instead of duplicating logic.
+  const fromAttr = document.documentElement.dataset.theme
+  if (fromAttr === 'light' || fromAttr === 'dark') {
+    theme.value = fromAttr
+  } else {
+    try {
+      const s = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null
+      if (s === 'light' || s === 'dark') {
+        theme.value = s
+      } else {
+        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+        theme.value = prefersDark ? 'dark' : 'light'
+      }
+    } catch (e) {
+      trackStorageError('read', e)
     }
-  } catch (e) {
-    trackStorageError('read', e)
   }
+
   apply(theme.value)
 }
 
