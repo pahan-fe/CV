@@ -295,7 +295,7 @@ onMounted(() => {
 
 .theme-toggle-sticky {
   position: fixed;
-  top: 24px;
+  top: 40px;
   right: max(24px, calc((100vw - 1100px) / 2 + 24px));
   z-index: 100;
 }
@@ -888,7 +888,7 @@ onMounted(() => {
   .cv { padding: 24px 12px 48px; }
   .hero__first, .hero__last { font-size: 2.2rem; }
   .hero { flex-wrap: wrap; }
-  .theme-toggle-sticky { top: 56px; right: 12px; }
+  .theme-toggle-sticky { top: 72px; right: 12px; }
   .card { padding: 14px; }
   .tag { font-size: 0.75rem; padding: 3px 8px; }
   .contact-grid { grid-template-columns: 1fr; }
