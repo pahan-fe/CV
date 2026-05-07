@@ -104,8 +104,6 @@ useSeoMeta({
 
 <style scoped>
 #app {
-  background: var(--bg);
-  color: var(--fg);
   min-height: 100vh;
   position: relative;
   font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
