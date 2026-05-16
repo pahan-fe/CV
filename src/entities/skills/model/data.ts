@@ -17,9 +17,10 @@ export const skillCategories: SkillCategory[] = [
   {
     label: 'TOOLS',
     skills: [
-      'Git', 'Webpack', 'Vite', 'Vitest', 'Jest', 'React Testing Library',
-      'Yarn', 'CI/CD (GitHub Actions)', 'Azure', 'AWS (S3)', 'Docker',
-      'Microfrontends', 'Single-spa', 'Import Maps', 'SystemJS', 'Claude',
+      'Git', 'REST API', 'Figma', 'Webpack', 'Vite', 'Vitest', 'Jest',
+      'React Testing Library', 'Playwright', 'Yarn', 'CI/CD (GitHub Actions)',
+      'Azure', 'AWS (S3)', 'Docker (multi-stage builds)', 'Microfrontends',
+      'Single-spa', 'Import Maps', 'SystemJS', 'Claude',
     ],
   },
   {

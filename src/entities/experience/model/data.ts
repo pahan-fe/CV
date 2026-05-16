@@ -10,9 +10,9 @@ export const experience: Experience[] = [
       {
         title: 'Key results',
         details: [
-          'Revenue Growth (35% Increase): Worked within the engineering team to develop the Self-Service Kiosk platform from scratch; engineered the core architecture (cart flow, complex menu) using React, Redux Toolkit, and TypeScript, resulting in 53k+ daily orders.',
-          'Engineering Velocity (92%+ Acceleration): Resolved a critical bottleneck in feedback loops by refactoring CI/CD pipelines (GitHub Actions, Azure, AWS). Reduced deployment cycles from 20 minutes to 1.5 minutes, enabling a 30%+ increase in feature velocity.',
-          'Operational Cost Reduction (99% Speedup): Fully automated environment readiness (with Head of Frontend). Slashed setup time from 5 hours to 1 minute, freeing up hundreds of developer hours annually.',
+          'Revenue Growth (35% Increase): Aiming to establish a breakthrough ordering channel, worked within the engineering team to develop the Self-Service Kiosk platform from scratch; engineered the core architecture (cart flow, complex menu) using React, Redux Toolkit, and TypeScript, resulting in 53k+ daily orders.',
+          'Engineering Velocity (92%+ Acceleration): Deployment latency was blocking fast feedback loops and wasting engineering capacity. Resolved a critical bottleneck in the feedback loop that caused delivery delays and engineering idle time by refactoring CI/CD pipelines (GitHub Actions, Azure, AWS). Reduced deployment cycles from 20 minutes to 1.5 minutes, enabling a 30%+ increase in feature velocity.',
+          'Operational Cost Reduction (99% Speedup): Slow and costly project kickoffs were delaying value creation and project execution. Fundamentally reduced engineering operational costs by fully automating environment readiness (with Head of Frontend). Built an internal project scaffolding CLI (akin to create-react-app) tailored to our microfrontend infrastructure - reducing environment setup from 5 hours to 1 minute and freeing up hundreds of developer hours annually.',
           'Conversion Boost (15% Increase): Developed an interactive shop-window for the Self-Service Kiosk platform using React Transition Group and Styled Components, driving a 15% increase in orders and revenue.',
         ],
       },
@@ -24,6 +24,7 @@ export const experience: Experience[] = [
           'Business Scalability: Engineered 30+ B2B interfaces (React, TypeScript); scaled the ecosystem using Microfrontends architecture (single-spa, SystemJS, import maps); enabled the team to develop products 2x faster.',
           'Long-term Cost Efficiency: Partnered with the Head of Frontend to implement company-wide standards and automated tooling, significantly lowering long-term cost of ownership and technical debt.',
           'Delivery Metrics & Insights: Designed and implemented a delivery lead time dashboard (Node.js, Kusto, Redash) for the CTO, enabling data-driven comparison of deployment performance across microfrontends and backend services.',
+          'Participated in technical interviews for frontend and full-stack candidates.',
           'Assisted in onboarding new frontend developers, including code reviews and mentorship support.',
           'Contributed to an internal API (NestJS, TypeORM) for version management across 70+ microfrontends, improving the team\'s release workflow.',
         ],
