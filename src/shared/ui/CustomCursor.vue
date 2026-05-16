@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
-  const props = defineProps<{ theme: 'dark' | 'light' }>()
+  defineProps<{ theme: 'dark' | 'light' }>()
 
   const enabled = ref(false)
   const visible = ref(false)
