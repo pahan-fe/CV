@@ -1,95 +1,96 @@
 <script setup lang="ts">
-import { useTheme } from './features/theme-toggle/model/useTheme'
-import { THEME_COLORS } from './shared/lib/theme'
-import AmbientCanvas from './shared/ui/AmbientCanvas.vue'
-import CookieConsent from './features/cookie-consent/ui/CookieConsent.vue'
+  import { useTheme } from './features/theme-toggle/model/useTheme'
+  import { THEME_COLORS } from './shared/lib/theme'
+  import AmbientCanvas from './shared/ui/AmbientCanvas.vue'
+  import CustomCursor from './shared/ui/CustomCursor.vue'
+  import CookieConsent from './features/cookie-consent/ui/CookieConsent.vue'
 
-const url = useRequestURL()
-const siteName = 'Pavel Zagvozdin — CV'
-const config = useRuntimeConfig()
-const route = useRoute()
-const canonical = computed(() => `${config.public.siteUrl}${route.path}`)
-const ogImage = computed(() => `${config.public.siteUrl}/og.png`)
-const { theme } = useTheme()
-const metaThemeColor = computed(() => THEME_COLORS[theme.value])
+  const url = useRequestURL()
+  const siteName = 'Pavel Zagvozdin — CV'
+  const config = useRuntimeConfig()
+  const route = useRoute()
+  const canonical = computed(() => `${config.public.siteUrl}${route.path}`)
+  const ogImage = computed(() => `${config.public.siteUrl}/og.png`)
+  const { theme } = useTheme()
+  const metaThemeColor = computed(() => THEME_COLORS[theme.value])
 
-const faviconLinks = import.meta.dev
-  ? [
-      { rel: 'icon', href: '/favicon.ico' },
-      { rel: 'shortcut icon', href: '/favicon.ico' },
-    ]
-  : [
-      { rel: 'icon', type: 'image/svg+xml', sizes: 'any', href: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236b7280"><path d="M4 6h16a1 1 0 0 1 1 1v9H3V7a1 1 0 0 1 1-1z"/><path d="M2 18h20v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/></svg>' },
-    ]
+  const faviconLinks = import.meta.dev
+    ? [
+        { rel: 'icon', href: '/favicon.ico' },
+        { rel: 'shortcut icon', href: '/favicon.ico' },
+      ]
+    : [
+        { rel: 'icon', type: 'image/svg+xml', sizes: 'any', href: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236b7280"><path d="M4 6h16a1 1 0 0 1 1 1v9H3V7a1 1 0 0 1 1-1z"/><path d="M2 18h20v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/></svg>' },
+      ]
 
-const isOnline = ref(true)
-const scrollY = ref(0)
-let onOnline: () => void
-let onOffline: () => void
-let scrollRaf: number
+  const isOnline = ref(true)
+  const scrollY = ref(0)
+  let onOnline: () => void
+  let onOffline: () => void
+  let scrollRaf: number
 
-onMounted(() => {
-  isOnline.value = navigator.onLine
-  onOnline = () => {
-    isOnline.value = true
-  }
-  onOffline = () => {
-    isOnline.value = false
-  }
-  window.addEventListener('online', onOnline)
-  window.addEventListener('offline', onOffline)
+  onMounted(() => {
+    isOnline.value = navigator.onLine
+    onOnline = () => {
+      isOnline.value = true
+    }
+    onOffline = () => {
+      isOnline.value = false
+    }
+    window.addEventListener('online', onOnline)
+    window.addEventListener('offline', onOffline)
 
-  const updateScroll = () => {
-    scrollY.value = window.scrollY
-    scrollRaf = requestAnimationFrame(updateScroll)
-  }
-  updateScroll()
-})
+    const updateScroll = () => {
+      scrollY.value = window.scrollY
+      scrollRaf = requestAnimationFrame(updateScroll)
+    }
+    updateScroll()
+  })
 
-onBeforeUnmount(() => {
-  if (onOnline) {
-    window.removeEventListener('online', onOnline)
-  }
-  if (onOffline) {
-    window.removeEventListener('offline', onOffline)
-  }
-  cancelAnimationFrame(scrollRaf)
-})
+  onBeforeUnmount(() => {
+    if (onOnline) {
+      window.removeEventListener('online', onOnline)
+    }
+    if (onOffline) {
+      window.removeEventListener('offline', onOffline)
+    }
+    cancelAnimationFrame(scrollRaf)
+  })
 
-useHead({
-  titleTemplate: (titleChunk?: string) => (titleChunk ? titleChunk : siteName),
-  htmlAttrs: { lang: 'en' },
-  meta: [
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { charset: 'utf-8' },
-  ],
-  link: [
-    { rel: 'canonical', href: canonical.value },
-    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Darker+Grotesque:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap' },
-    { rel: 'stylesheet', href: 'https://fonts.cdnfonts.com/css/electroharmonix' },
-    ...faviconLinks,
-  ],
-})
+  useHead({
+    titleTemplate: (titleChunk?: string) => (titleChunk ? titleChunk : siteName),
+    htmlAttrs: { lang: 'en' },
+    meta: [
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { charset: 'utf-8' },
+    ],
+    link: [
+      { rel: 'canonical', href: canonical.value },
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Darker+Grotesque:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap' },
+      { rel: 'stylesheet', href: 'https://fonts.cdnfonts.com/css/electroharmonix' },
+      ...faviconLinks,
+    ],
+  })
 
-useSeoMeta({
-  title: siteName,
-  description: 'Senior Frontend Engineer CV.',
-  robots: 'index, follow',
-  ogTitle: siteName,
-  ogDescription: 'Senior Frontend Engineer CV.',
-  ogType: 'website',
-  ogUrl: url.href,
-  ogSiteName: siteName,
-  ogImage: ogImage.value,
-  ogImageAlt: siteName,
-  twitterCard: 'summary_large_image',
-  twitterTitle: siteName,
-  twitterDescription: 'Senior Frontend Engineer CV.',
-  twitterImage: ogImage.value,
-  themeColor: metaThemeColor,
-})
+  useSeoMeta({
+    title: siteName,
+    description: 'Senior Frontend Engineer CV.',
+    robots: 'index, follow',
+    ogTitle: siteName,
+    ogDescription: 'Senior Frontend Engineer CV.',
+    ogType: 'website',
+    ogUrl: url.href,
+    ogSiteName: siteName,
+    ogImage: ogImage.value,
+    ogImageAlt: siteName,
+    twitterCard: 'summary_large_image',
+    twitterTitle: siteName,
+    twitterDescription: 'Senior Frontend Engineer CV.',
+    twitterImage: ogImage.value,
+    themeColor: metaThemeColor,
+  })
 </script>
 
 <template>
@@ -99,37 +100,38 @@ useSeoMeta({
     <div v-if="!isOnline" class="offline-banner">You're offline. Viewing cached content.</div>
     <CookieConsent />
     <NuxtPage />
+    <CustomCursor :theme="theme" />
   </div>
 </template>
 
 <style scoped>
-#app {
-  min-height: 100vh;
-  position: relative;
-  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-}
+  #app {
+    min-height: 100vh;
+    position: relative;
+    font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  }
 
-.grain {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 180px;
-}
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 180px;
+  }
 
-.offline-banner {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: var(--accent-soft);
-  color: var(--accent);
-  padding: 8px 12px;
-  text-align: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  border-bottom: 1px solid var(--accent);
-}
+  .offline-banner {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 8px 12px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--accent);
+  }
 </style>

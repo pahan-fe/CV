@@ -28,6 +28,16 @@ img, picture, video, canvas, svg { display: block; max-width: 100%; }
 input, button, textarea, select { font: inherit; }
 button { background: none; border: 0; color: inherit; cursor: pointer; }
 
+@media (hover: hover) and (pointer: fine) {
+  html.custom-cursor-on,
+  html.custom-cursor-on body,
+  html.custom-cursor-on *,
+  html.custom-cursor-on *::before,
+  html.custom-cursor-on *::after {
+    cursor: none !important;
+  }
+}
+
 p, h1, h2, h3, h4, h5, h6 { overflow-wrap: anywhere; }
 
 #app, #__nuxt { isolation: isolate; }
